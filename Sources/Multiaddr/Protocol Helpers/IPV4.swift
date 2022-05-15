@@ -6,12 +6,23 @@
 //
 
 import Foundation
-import Network
+//import Network
 
 struct IPv4 {
+    //static func data(for string: String) throws -> Data {
+    //    guard let addr = IPv4Address(string) else { throw MultiaddrError.parseIPv4AddressFail }
+    //    return addr.rawValue
+    //}
+    
+    /// Converts an IPv4 string address into it's data representation
+    ///
+    /// - Note: This code was lifted from [Bouke/DNS](https://github.com/Bouke/DNS/blob/master/Sources/DNS/IP.swift)
     static func data(for string: String) throws -> Data {
-        guard let addr = IPv4Address(string) else { throw MultiaddrError.parseIPv4AddressFail }
-        return addr.rawValue
+        var address = in_addr()
+        guard inet_pton(AF_INET, string, &address) == 1 else {
+            throw MultiaddrError.parseIPv4AddressFail
+        }
+        return address.s_addr.byteSwapped.bytes
     }
     
     static func string(for data: Data) throws -> String {
@@ -34,6 +45,16 @@ extension Data {
     var uint32: UInt32 {
         return withUnsafeBytes {
             $0.load(as: UInt32.self)
+        }
+    }
+}
+
+extension BinaryInteger {
+    // returns little endian; use .bigEndian.bytes for BE.
+    var bytes: Data {
+        var copy = self
+        return withUnsafePointer(to: &copy) {
+            Data(Data(bytes: $0, count: MemoryLayout<Self>.size).reversed())
         }
     }
 }
