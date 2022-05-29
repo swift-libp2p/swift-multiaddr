@@ -42,13 +42,21 @@ struct IPv6 {
         guard data.count == MemoryLayout<in6_addr>.size else {
             throw MultiaddrError.parseIPv4AddressFail
         }
-        var address = data.withUnsafeBytes { bytesPointer -> in6_addr in
-            bytesPointer.load(as: in6_addr.self)
+        //var address = data.withUnsafeBytes { bytesPointer -> in6_addr in
+        //    bytesPointer.load(as: in6_addr.self)
+        //}
+        var address = data.withUnsafeBytes { (bytesPointer: UnsafePointer<UInt8>) -> in6_addr in
+            bytesPointer.withMemoryRebound(to: in6_addr.self, capacity: 1) { $0.pointee }
         }
         
         var output = Data(count: Int(INET6_ADDRSTRLEN))
-        guard let presentationBytes = output.withUnsafeMutableBytes({ ptr -> UnsafePointer<CChar>? in
-            inet_ntop(AF_INET6, &address, ptr.baseAddress, socklen_t(INET6_ADDRSTRLEN))
+        //guard let presentationBytes = output.withUnsafeMutableBytes({ ptr -> UnsafePointer<CChar>? in
+        //    inet_ntop(AF_INET6, &address, ptr.baseAddress, socklen_t(INET6_ADDRSTRLEN))
+        //}) else {
+        //    return "Invalid IPv6 address"
+        //}
+        guard let presentationBytes = output.withUnsafeMutableBytes({
+            inet_ntop(AF_INET6, &address, $0, socklen_t(INET6_ADDRSTRLEN))
         }) else {
             return "Invalid IPv6 address"
         }
