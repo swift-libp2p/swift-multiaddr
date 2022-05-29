@@ -52,16 +52,6 @@ extension MultiaddrProtocol {
     func packedCode() -> Data {
         return code.varIntData()
     }
-    
-    /// Supports p2p and ipfs equality check...
-    public static func == (lhs:MultiaddrProtocol, rhs:MultiaddrProtocol) -> Bool {
-        switch (lhs, rhs) {
-        case (.p2p, .ipfs): return true
-        case (.ipfs, .p2p): return true
-        default:
-            return lhs.rawValue == rhs.rawValue
-        }
-    }
 }
 
 // MARK: - Helpers
