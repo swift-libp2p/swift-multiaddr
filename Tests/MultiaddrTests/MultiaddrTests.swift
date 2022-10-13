@@ -45,6 +45,32 @@ final class MultiaddrTests: XCTestCase {
         XCTAssertEqual(Set(addresses).count, 5)
     }
     
+    func testContainsEquatable() {
+        var addresses = [
+            try! Multiaddr("/dnsaddr/bootstrap.libp2p.io/p2p/QmQCU2EcMqAqQPR2i9bChDtGNJchTbq5TbXJJ16u19uLTa"),
+            try! Multiaddr("/dnsaddr/bootstrap.libp2p.io/p2p/QmbLHAnMoJPWSCR5Zhtx6BHJX9KiKNN6tpvbUcqanj75Nb"),
+            try! Multiaddr("/dnsaddr/bootstrap.libp2p.io/p2p/QmcZf59bWwK5XFi76CZX8cbJ4BhTzzA3gU1ZjYZcYW3dwt"),
+            try! Multiaddr("/ip4/104.131.131.82/tcp/4001/p2p/QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ"),
+        ]
+        
+        /// Mostly Duplicate Entries
+        let duplicates = [
+            try! Multiaddr("/dnsaddr/bootstrap.libp2p.io/p2p/QmNnooDu7bfjPFoTZYxMNLWUQJyrVwtbZg5gBMjTezGAJN"),
+            try! Multiaddr("/dnsaddr/bootstrap.libp2p.io/p2p/QmQCU2EcMqAqQPR2i9bChDtGNJchTbq5TbXJJ16u19uLTa"),
+            try! Multiaddr("/dnsaddr/bootstrap.libp2p.io/p2p/QmbLHAnMoJPWSCR5Zhtx6BHJX9KiKNN6tpvbUcqanj75Nb"),
+            try! Multiaddr("/dnsaddr/bootstrap.libp2p.io/p2p/QmcZf59bWwK5XFi76CZX8cbJ4BhTzzA3gU1ZjYZcYW3dwt"),
+            try! Multiaddr("/ip4/104.131.131.82/tcp/4001/p2p/QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ")
+        ]
+        
+        for duplicate in duplicates {
+            if !addresses.contains(duplicate) {
+                addresses.append(duplicate)
+            }
+        }
+        
+        XCTAssertEqual(addresses.count, 5)
+    }
+    
     func testCreateMultiaddrFromBytes_IPv4() {
         let bytes = [0x04, 0xc0, 0x00, 0x02, 0x2a] as [UInt8] // 04c000022a
         let data = Data(bytes: bytes, count: bytes.count)
@@ -286,6 +312,7 @@ final class MultiaddrTests: XCTestCase {
         ("testIPv4InvalidString", testIPv4InvalidString),
         ("testIPv6InvalidString", testIPv6InvalidString),
         ("testHashable", testHashable),
+        ("testContainsEquatable", testContainsEquatable),
     ]
     
     /// Credit: https://oleb.net/blog/2017/03/keeping-xctest-in-sync/
