@@ -33,7 +33,11 @@ struct IPv4 {
         var address = in_addr(s_addr: data.uint32)
         
         guard let presentationBytes = output.withUnsafeMutableBytes({
+            #if swift(>=5.6)
             inet_ntop(AF_INET, &address, $0.baseAddress, socklen_t(INET_ADDRSTRLEN))
+            #else
+            inet_ntop(AF_INET, &address, $0, socklen_t(INET_ADDRSTRLEN))
+            #endif
         }) else {
             return "Invalid IPv4 address"
         }

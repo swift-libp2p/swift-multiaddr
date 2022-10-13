@@ -49,7 +49,11 @@ struct IPv6 {
         
         var output = Data(count: Int(INET6_ADDRSTRLEN))
         guard let presentationBytes = output.withUnsafeMutableBytes({
+            #if swift(>=5.6)
             inet_ntop(AF_INET6, &address, $0.baseAddress, socklen_t(INET6_ADDRSTRLEN))
+            #else
+            inet_ntop(AF_INET6, &address, $0, socklen_t(INET6_ADDRSTRLEN))
+            #endif
         }) else {
             return "Invalid IPv6 address"
         }
