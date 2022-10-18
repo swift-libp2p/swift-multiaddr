@@ -16,4 +16,5 @@ enum MultiaddrError: Error {
     case invalidOnionHostAddress
     case unknownProtocol
     case ipfsAddressLengthConflict
+    case unknownCodec
 }

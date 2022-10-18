@@ -111,6 +111,45 @@ public struct Multiaddr: Equatable {
             return "/" + path
         } else { return nil }
     }
+    
+    /// Returns a new Multiaddr replacing the Address associated with the specified codec
+    ///
+    /// - Parameters:
+    ///   - newAddress: The address to swap the current one with
+    ///   - codec: The Codec of the address to swap
+    /// - Returns: A new Multiaddr with the specified Codec Address swapped
+    public func swap(address newAddress:String, forCodec codec:MultiaddrProtocol) throws -> Multiaddr {
+        let matchIndex = self.addresses.firstIndex { $0.codec == codec }
+        
+        /// If we found a match, replace it's Address
+        if let idx = matchIndex {
+            var newAddresses = self.addresses
+            newAddresses[idx] = Address(addrProtocol: codec, address: newAddress)
+            let newMA = Multiaddr(newAddresses)
+            try newMA.validate()
+            return newMA
+        } else {
+            return self
+        }
+    }
+    
+    /// Mutates the Multiaddr if the specified Codec is found by replacing the address with the provided new address
+    ///
+    /// - Parameters:
+    ///   - newAddress: The address to swap the current one with
+    ///   - codec: The Codec of the address to swap
+    public mutating func mutatingSwap(address newAddress:String, forCodec codec:MultiaddrProtocol) throws {
+        let matchIndex = self.addresses.firstIndex { $0.codec == codec }
+        
+        /// If we found a match, replace it's Address
+        if let idx = matchIndex {
+            self.addresses[idx] = Address(addrProtocol: codec, address: newAddress)
+        } else {
+            throw MultiaddrError.unknownCodec
+        }
+        /// Ensure the change is valid...
+        try validate()
+    }
 }
 
 extension Multiaddr: CustomStringConvertible {

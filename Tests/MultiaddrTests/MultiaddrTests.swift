@@ -23,6 +23,42 @@ final class MultiaddrTests: XCTestCase {
         }
     }
     
+    func testSwapMultiaddrFromString() {
+        let ma = try! Multiaddr("/ip4/127.0.0.1/udp/1234")
+        // Assert Invalid Address Throws Error
+        XCTAssertThrowsError(try ma.swap(address: "192.168.1.644", forCodec: .ip4))
+        // Assert Valid Address works
+        XCTAssertNoThrow(try ma.swap(address: "192.168.1.44", forCodec: .ip4))
+        XCTAssertEqual(try ma.swap(address: "192.168.1.44", forCodec: .ip4).description, "/ip4/192.168.1.44/udp/1234")
+        
+        // Assert Invalid UDP Port Throws Error
+        XCTAssertThrowsError(try ma.swap(address: "1235.1", forCodec: .udp))
+        XCTAssertThrowsError(try ma.swap(address: "123511", forCodec: .udp))
+        // Assert Valid Port works
+        XCTAssertNoThrow(try ma.swap(address: "1235", forCodec: .udp))
+        XCTAssertEqual(try ma.swap(address: "1235", forCodec: .udp).description, "/ip4/127.0.0.1/udp/1235")
+        
+        XCTAssertEqual(ma.description, "/ip4/127.0.0.1/udp/1234")
+    }
+    
+    func testSwapMultiaddrFromStringMutating() {
+        var ma = try! Multiaddr("/ip4/127.0.0.1/udp/1234")
+        // Assert Invalid Address Throws Error
+        XCTAssertThrowsError(try ma.mutatingSwap(address: "192.168.1.644", forCodec: .ip4))
+        // Assert Valid Address works
+        XCTAssertNoThrow(try ma.mutatingSwap(address: "192.168.1.44", forCodec: .ip4))
+        print(ma)
+        
+        // Assert Invalid UDP Port Throws Error
+        XCTAssertThrowsError(try ma.mutatingSwap(address: "1235.1", forCodec: .udp))
+        XCTAssertThrowsError(try ma.mutatingSwap(address: "123511", forCodec: .udp))
+        // Assert Valid Port works
+        XCTAssertNoThrow(try ma.mutatingSwap(address: "1235", forCodec: .udp))
+        
+        print(ma)
+        XCTAssertEqual(ma.description, "/ip4/192.168.1.44/udp/1235")
+    }
+    
     func testHashable() {
         let addresses = [
             try! Multiaddr("/dnsaddr/bootstrap.libp2p.io/p2p/QmNnooDu7bfjPFoTZYxMNLWUQJyrVwtbZg5gBMjTezGAJN"),
@@ -313,6 +349,8 @@ final class MultiaddrTests: XCTestCase {
         ("testIPv6InvalidString", testIPv6InvalidString),
         ("testHashable", testHashable),
         ("testContainsEquatable", testContainsEquatable),
+        ("testSwapMultiaddrFromString", testSwapMultiaddrFromString),
+        ("testSwapMultiaddrFromStringMutating", testSwapMultiaddrFromStringMutating)
     ]
     
     /// Credit: https://oleb.net/blog/2017/03/keeping-xctest-in-sync/
