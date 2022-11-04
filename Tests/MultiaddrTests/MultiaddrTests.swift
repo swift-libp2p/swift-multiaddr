@@ -146,6 +146,8 @@ final class MultiaddrTests: XCTestCase {
         XCTAssertEqual(try! m_fromData.binaryPacked(), try! m_fromString.binaryPacked())
     }
     
+    /// IPFS Overload no longer exists (these should no longer be equal)
+    /// - Note: https://github.com/multiformats/multicodec/pull/283
     func testCreateMultiaddrFromBytes_IpfsAddress() {
         let bytes = [0xa5, 0x03, 0x22, 0x12, 0x20, 0xd5, 0x2e, 0xbb, 0x89, 0xd8, 0x5b, 0x02, 0xa2, 0x84, 0x94, 0x82, 0x03, 0xa6, 0x2f, 0xf2, 0x83, 0x89, 0xc5, 0x7c, 0x9f, 0x42, 0xbe, 0xec, 0x4e, 0xc2, 0x0d, 0xb7, 0x6a, 0x68, 0x91, 0x1c, 0x0b] as [UInt8]
         let data = Data(bytes: bytes, count: bytes.count)
@@ -160,7 +162,7 @@ final class MultiaddrTests: XCTestCase {
         
         /// The binary data should be the same across p2p and deprecated ipfs codecs
         XCTAssertEqual(try! m_fromData.binaryPacked(), try! m_fromStringP2P.binaryPacked())
-        XCTAssertEqual(try! m_fromData.binaryPacked(), try! m_fromStringIPFS.binaryPacked())
+        XCTAssertNotEqual(try! m_fromData.binaryPacked(), try! m_fromStringIPFS.binaryPacked())
     }
     
     func testCreateMultiaddrFromBytes_P2PAddressBase32() throws {
