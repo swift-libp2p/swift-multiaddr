@@ -744,13 +744,15 @@ class ProtocolsTests: XCTestCase {
 //        expect(addr).to.have.property('bytes')
 //        expect(addr.toString()).to.equal(str.replace('/ipfs/', '/p2p/'))
 //      })
+    /// IPFS Overload no longer exists (these should no longer be equal)
+    /// - Note: https://github.com/multiformats/multicodec/pull/283
     func testIPFS() throws {
         let str = "/ipfs/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC"
         let addr = try Multiaddr(str)
         // Description should equal initialization string
         XCTAssertEqual(addr.description, str)
         XCTAssertEqual(addr.addresses, [Address(addrProtocol: .ipfs, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")])
-        XCTAssertEqual(addr.addresses, [Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")])
+        XCTAssertNotEqual(addr.addresses, [Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")])
     }
     
 //      it('onion', () => {
