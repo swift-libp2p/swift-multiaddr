@@ -284,9 +284,9 @@ final class MultiaddrTests: XCTestCase {
         XCTAssertEqual(actual, expected)
     }
     
-    func testBinaryPacked_ForIpfsAddress_EncodesCorrectly() {
+    func testBinaryPacked_ForP2PAddress_EncodesCorrectly() {
         let expected = "a503221220d52ebb89d85b02a284948203a62ff28389c57c9f42beec4ec20db76a68911c0b"
-        let m = try! Multiaddr("/ipfs/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
+        let m = try! Multiaddr("/p2p/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
         let actual = try! m.binaryPacked().hexString()
         XCTAssertEqual(actual, expected)
     }
@@ -337,7 +337,7 @@ final class MultiaddrTests: XCTestCase {
         ("testBinaryPackedReturnsCorrectValue_ForIPv4Address", testBinaryPackedReturnsCorrectValue_ForIPv4Address),
         ("testBinaryPackedThrowsError_ForInvalidIPv4Address", testBinaryPackedThrowsError_ForInvalidIPv4Address),
         ("testBinaryPacked_ForOnionAddress_EncodesCorrectly", testBinaryPacked_ForOnionAddress_EncodesCorrectly),
-        ("testBinaryPacked_ForIpfsAddress_EncodesCorrectly", testBinaryPacked_ForIpfsAddress_EncodesCorrectly),
+        ("testBinaryPacked_ForP2PAddress_EncodesCorrectly", testBinaryPacked_ForP2PAddress_EncodesCorrectly),
         ("testCreateMultiaddrFromBytes_IPv4", testCreateMultiaddrFromBytes_IPv4),
         ("testCreateMultiaddrFromBytes_TcpAddress", testCreateMultiaddrFromBytes_TcpAddress),
         ("testCreateMultiaddrFromBytes_Onion", testCreateMultiaddrFromBytes_Onion),
