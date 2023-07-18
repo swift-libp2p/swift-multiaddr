@@ -1,6 +1,8 @@
 import XCTest
 @testable import Multiaddr
 import Multibase
+import Multihash
+import CID
 
 final class MultiaddrTests: XCTestCase {
     func testDump() throws {
@@ -8,10 +10,10 @@ final class MultiaddrTests: XCTestCase {
         dump(addr)
     }
     
-    func testCreateMultiaddrFromString() {
+    func testCreateMultiaddrFromString() throws {
         let m = try! Multiaddr("/ip4/127.0.0.1/udp/1234")
-        let expectedAddress1 = Address(addrProtocol: .ip4, address: "127.0.0.1")
-        let expectedAddress2 = Address(addrProtocol: .udp, address: "1234")
+        let expectedAddress1 = try Address(addrProtocol: .ip4, address: "127.0.0.1")
+        let expectedAddress2 = try Address(addrProtocol: .udp, address: "1234")
         
         XCTAssertEqual(m.addresses.first, expectedAddress1)
         XCTAssertEqual(m.addresses.last, expectedAddress2)
@@ -181,32 +183,32 @@ final class MultiaddrTests: XCTestCase {
         XCTAssertEqual(try addrBase32.binaryPacked(), try addrBase58.binaryPacked())
     }
     
-    func testCreateMultiaddrFromString_WithoutAddressValue() {
+    func testCreateMultiaddrFromString_WithoutAddressValue() throws {
         let m = try! Multiaddr("/dns6/foo.com/tcp/443/https")
-        let expectedAddress1 = Address(addrProtocol: .dns6, address: "foo.com")
-        let expectedAddress2 = Address(addrProtocol: .tcp, address: "443")
-        let expectedAddress3 = Address(addrProtocol: .https, address: nil)
+        let expectedAddress1 = try Address(addrProtocol: .dns6, address: "foo.com")
+        let expectedAddress2 = try Address(addrProtocol: .tcp, address: "443")
+        let expectedAddress3 = try Address(addrProtocol: .https, address: nil)
         
         XCTAssertEqual(m.addresses[0], expectedAddress1)
         XCTAssertEqual(m.addresses[1], expectedAddress2)
         XCTAssertEqual(m.addresses[2], expectedAddress3)
     }
     
-    func testCreateMultiaddrFromString_AddressValueHasMultipleSlashes() {
+    func testCreateMultiaddrFromString_AddressValueHasMultipleSlashes() throws {
         let m = try! Multiaddr("/dns4/foo.com/tcp/80/http/bar/baz.jpg")
-        let expectedAddress1 = Address(addrProtocol: .dns4, address: "foo.com")
-        let expectedAddress2 = Address(addrProtocol: .tcp, address: "80")
-        let expectedAddress3 = Address(addrProtocol: .http, address: "bar/baz.jpg")
+        let expectedAddress1 = try Address(addrProtocol: .dns4, address: "foo.com")
+        let expectedAddress2 = try Address(addrProtocol: .tcp, address: "80")
+        let expectedAddress3 = try Address(addrProtocol: .http, address: "bar/baz.jpg")
         
         XCTAssertEqual(m.addresses[0], expectedAddress1)
         XCTAssertEqual(m.addresses[1], expectedAddress2)
         XCTAssertEqual(m.addresses[2], expectedAddress3)
     }
     
-    func testCreateMultiaddrFromString_AddressValueHasColons() {
+    func testCreateMultiaddrFromString_AddressValueHasColons() throws {
         let m = try! Multiaddr("/ip6/::1/tcp/3217")
-        let expectedAddress1 = Address(addrProtocol: .ip6, address: "::1")
-        let expectedAddress2 = Address(addrProtocol: .tcp, address: "3217")
+        let expectedAddress1 = try Address(addrProtocol: .ip6, address: "::1")
+        let expectedAddress2 = try Address(addrProtocol: .tcp, address: "3217")
         
         XCTAssertEqual(m.addresses[0], expectedAddress1)
         XCTAssertEqual(m.addresses[1], expectedAddress2)
@@ -302,12 +304,12 @@ final class MultiaddrTests: XCTestCase {
     }
 
     func testIPv6FromString() throws {
-        let addy = Address(addrProtocol: .ip6, address: "ABCD::1:2:3:4:5:6")
+        let addy = try Address(addrProtocol: .ip6, address: "ABCD::1:2:3:4:5:6")
         XCTAssertEqual(try IPv6.data(for: addy.address!).asString(base: .base16Upper), "ABCD0000000100020003000400050006")
     }
 
     func testIPv4FromString() throws {
-        let addy = Address(addrProtocol: .ip4, address: "192.168.0.1")
+        let addy = try Address(addrProtocol: .ip4, address: "192.168.0.1")
         XCTAssertEqual(try IPv4.data(for: addy.address!).asString(base: .base16), "c0a80001")
     }
 
@@ -320,6 +322,44 @@ final class MultiaddrTests: XCTestCase {
         XCTAssertThrowsError( try Multiaddr(.ip6, address: "FFFF::GGGG") )
     }
     
+    func testDecodeEmbeddedCerthashFromBytes() throws {
+        let addy1Bytes = Data(hex: "046883835291020fa1cd03d103d203221220a78c594f830726e17fba30224d448d5c4a4434e9e5a14f24b3822d14da46d19bd203221220855beff35231e37b3c4970b3e16e0e100eba09adc3e1ad5473a16c97f258b61e")
+        
+        let ma = try Multiaddr(addy1Bytes)
+        print(ma)
+        
+        let addy1Packed = try ma.binaryPacked()
+        XCTAssertEqual(addy1Bytes, addy1Packed)
+    }
+    
+    func testConstructCerthashMultiaddr() throws {
+        let ma1 = try Multiaddr("/ip4/104.131.131.82/udp/4001/quic-v1/webtransport/certhash/f1220a78c594f830726e17fba30224d448d5c4a4434e9e5a14f24b3822d14da46d19b/certhash/f1220855beff35231e37b3c4970b3e16e0e100eba09adc3e1ad5473a16c97f258b61e")
+        let expectedPackedAddress1 = Data(hex: "046883835291020fa1cd03d103d203221220a78c594f830726e17fba30224d448d5c4a4434e9e5a14f24b3822d14da46d19bd203221220855beff35231e37b3c4970b3e16e0e100eba09adc3e1ad5473a16c97f258b61e")
+        XCTAssertEqual(try ma1.binaryPacked(), expectedPackedAddress1)
+        let unpacked1 = try Multiaddr(expectedPackedAddress1)
+        XCTAssertEqual(ma1, unpacked1)
+        XCTAssertEqual(try ma1.binaryPacked(), try unpacked1.binaryPacked())
+        
+        let ma2 = try Multiaddr("/ip4/127.0.0.1/udp/1234/quic-v1/webtransport/certhash/b2uaraocy6yrdblb4sfptaddgimjmmpy")
+        let expectedPackedAddress2 = Data(hex: "047f000001910204d2cd03d103d20313d501103858f62230ac3c915f300c664312c63f")
+        XCTAssertEqual(try ma2.binaryPacked(), expectedPackedAddress2)
+        let unpacked2 = try Multiaddr(expectedPackedAddress2)
+        XCTAssertEqual(ma2, unpacked2)
+        XCTAssertEqual(try ma2.binaryPacked(), try unpacked2.binaryPacked())
+        
+        let ma3 = try Multiaddr("/ip4/127.0.0.1/udp/1234/quic-v1/webtransport/certhash/b2uaraocy6yrdblb4sfptaddgimjmmpy/certhash/zQmbWTwYGcmdyK9CYfNBcfs9nhZs17a6FQ4Y8oea278xx41")
+        let expectedPackedAddress3 = Data(hex: "047f000001910204d2cd03d103d20313d501103858f62230ac3c915f300c664312c63fd203221220c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2")
+        XCTAssertEqual(try ma3.binaryPacked(), expectedPackedAddress3)
+        let unpacked3 = try Multiaddr(expectedPackedAddress3)
+        XCTAssertEqual(ma3, unpacked3)
+        XCTAssertEqual(try ma3.binaryPacked(), try unpacked3.binaryPacked())
+    }
+    
+    func testFailesWithInvalidCerthash() throws {
+        XCTAssertThrowsError(try Multiaddr("/ip4/127.0.0.1/udp/1234/quic-v1/webtransport/certhash"))
+        XCTAssertThrowsError(try Multiaddr("/ip4/127.0.0.1/udp/1234/quic-v1/webtransport/certhash/b2uaraocy6yrdblb4sfptaddgimjmmp"))
+    }
+
     static var allTests = [
         ("testDump", testDump),
         ("testLinuxTestSuiteIncludesAllTests", testLinuxTestSuiteIncludesAllTests),
@@ -352,7 +392,10 @@ final class MultiaddrTests: XCTestCase {
         ("testHashable", testHashable),
         ("testContainsEquatable", testContainsEquatable),
         ("testSwapMultiaddrFromString", testSwapMultiaddrFromString),
-        ("testSwapMultiaddrFromStringMutating", testSwapMultiaddrFromStringMutating)
+        ("testSwapMultiaddrFromStringMutating", testSwapMultiaddrFromStringMutating),
+        ("testDecodeEmbeddedCerthashFromBytes", testDecodeEmbeddedCerthashFromBytes),
+        ("testConstructCerthashMultiaddr", testConstructCerthashMultiaddr),
+        ("testFailesWithInvalidCerthash", testFailesWithInvalidCerthash),
     ]
     
     /// Credit: https://oleb.net/blog/2017/03/keeping-xctest-in-sync/

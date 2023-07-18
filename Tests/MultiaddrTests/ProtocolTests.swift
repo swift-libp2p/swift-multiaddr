@@ -719,7 +719,7 @@ class ProtocolsTests: XCTestCase {
         print(addr)
         // Description should equal initialization string
         XCTAssertEqual(addr.description, str)
-        XCTAssertEqual(addr.addresses, [Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")])
+        XCTAssertEqual(addr.addresses, [try Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")])
     }
     
 //      it('p2p', () => {
@@ -735,7 +735,7 @@ class ProtocolsTests: XCTestCase {
         print(addr) //p2p/QmW8rAgaaA6sRydK1k6vonShQME47aDxaFidbtMevWs73t
         // Description should equal initialization string
         XCTAssertEqual(addr.description, "/p2p/QmW8rAgaaA6sRydK1k6vonShQME47aDxaFidbtMevWs73t")
-        XCTAssertEqual(addr.addresses, [Address(addrProtocol: .p2p, address: "QmW8rAgaaA6sRydK1k6vonShQME47aDxaFidbtMevWs73t")])
+        XCTAssertEqual(addr.addresses, [try Address(addrProtocol: .p2p, address: "QmW8rAgaaA6sRydK1k6vonShQME47aDxaFidbtMevWs73t")])
     }
     
 //      it('ipfs', () => {
@@ -751,8 +751,8 @@ class ProtocolsTests: XCTestCase {
         let addr = try Multiaddr(str)
         // Description should equal initialization string
         XCTAssertEqual(addr.description, str)
-        XCTAssertEqual(addr.addresses, [Address(addrProtocol: .ipfs, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")])
-        XCTAssertNotEqual(addr.addresses, [Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")])
+        XCTAssertEqual(addr.addresses, [try Address(addrProtocol: .ipfs, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")])
+        XCTAssertNotEqual(addr.addresses, [try Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")])
     }
     
 //      it('onion', () => {
@@ -766,7 +766,7 @@ class ProtocolsTests: XCTestCase {
         let addr = try Multiaddr(str)
         // Description should equal initialization string
         XCTAssertEqual(addr.description, str)
-        XCTAssertEqual(addr.addresses, [Address(addrProtocol: .onion, address: "timaq4ygg2iegci7:1234")])
+        XCTAssertEqual(addr.addresses, [try Address(addrProtocol: .onion, address: "timaq4ygg2iegci7:1234")])
     }
     
 //      it('onion bad length', () => {
@@ -811,7 +811,7 @@ class ProtocolsTests: XCTestCase {
         let addr = try Multiaddr(str)
         // Description should equal initialization string
         XCTAssertEqual(addr.description, str)
-        XCTAssertEqual(addr.addresses, [Address(addrProtocol: .onion3, address: "vww6ybal4bd7szmgncyruucpgfkqahzddi37ktceo3ah7ngmcopnpyyd:1234")])
+        XCTAssertEqual(addr.addresses, [try Address(addrProtocol: .onion3, address: "vww6ybal4bd7szmgncyruucpgfkqahzddi37ktceo3ah7ngmcopnpyyd:1234")])
     }
     
 //      it('onion3 bad length', () => {
@@ -854,8 +854,8 @@ class ProtocolsTests: XCTestCase {
         // Description should equal initialization string
         XCTAssertEqual(addr.description, str)
         XCTAssertEqual(addr.addresses, [
-                        Address(addrProtocol: .p2p_circuit, address: nil),
-                        Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
+            try Address(addrProtocol: .p2p_circuit, address: nil),
+            try Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
         ])
     }
     
@@ -871,8 +871,8 @@ class ProtocolsTests: XCTestCase {
         // Description should equal initialization string
         XCTAssertEqual(addr.description, str)
         XCTAssertEqual(addr.addresses, [
-                        Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC"),
-                        Address(addrProtocol: .p2p_circuit, address: "")
+            try Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC"),
+            try Address(addrProtocol: .p2p_circuit, address: "")
         ])
     }
     
@@ -888,8 +888,8 @@ class ProtocolsTests: XCTestCase {
         // Description should equal initialization string
         XCTAssertEqual(addr.description, str)
         XCTAssertEqual(addr.addresses, [
-            Address(addrProtocol: .ipfs, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC"),
-            Address(addrProtocol: .p2p_circuit, address: "")
+            try Address(addrProtocol: .ipfs, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC"),
+            try Address(addrProtocol: .p2p_circuit, address: "")
         ])
     }
     
@@ -905,11 +905,11 @@ class ProtocolsTests: XCTestCase {
         // Description should equal initialization string
         XCTAssertEqual(addr.description, str)
         XCTAssertEqual(addr.addresses, [
-            Address(addrProtocol: .ip4, address: "127.0.0.1"),
-            Address(addrProtocol: .tcp, address: "9090"),
-            Address(addrProtocol: .ws, address: ""),
-            Address(addrProtocol: .p2p_webrtc_star, address: ""),
-            Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
+            try Address(addrProtocol: .ip4, address: "127.0.0.1"),
+            try Address(addrProtocol: .tcp, address: "9090"),
+            try Address(addrProtocol: .ws, address: ""),
+            try Address(addrProtocol: .p2p_webrtc_star, address: ""),
+            try Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
         ])
     }
     
@@ -925,11 +925,11 @@ class ProtocolsTests: XCTestCase {
         // Description should equal initialization string
         XCTAssertEqual(addr.description, str)
         XCTAssertEqual(addr.addresses, [
-            Address(addrProtocol: .ip4, address: "127.0.0.1"),
-            Address(addrProtocol: .tcp, address: "9090"),
-            Address(addrProtocol: .ws, address: ""),
-            Address(addrProtocol: .p2p_webrtc_star, address: ""),
-            Address(addrProtocol: .ipfs, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
+            try Address(addrProtocol: .ip4, address: "127.0.0.1"),
+            try Address(addrProtocol: .tcp, address: "9090"),
+            try Address(addrProtocol: .ws, address: ""),
+            try Address(addrProtocol: .p2p_webrtc_star, address: ""),
+            try Address(addrProtocol: .ipfs, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
         ])
     }
     
@@ -939,11 +939,11 @@ class ProtocolsTests: XCTestCase {
         // Description should equal initialization string
         XCTAssertEqual(addr.description, "/ip4/127.0.0.1/tcp/9090/ws/p2p-webrtc-star/ipfs/QmW8rAgaaA6sRydK1k6vonShQME47aDxaFidbtMevWs73t")
         XCTAssertEqual(addr.addresses, [
-            Address(addrProtocol: .ip4, address: "127.0.0.1"),
-            Address(addrProtocol: .tcp, address: "9090"),
-            Address(addrProtocol: .ws, address: ""),
-            Address(addrProtocol: .p2p_webrtc_star, address: ""),
-            Address(addrProtocol: .ipfs, address: "QmW8rAgaaA6sRydK1k6vonShQME47aDxaFidbtMevWs73t")
+            try Address(addrProtocol: .ip4, address: "127.0.0.1"),
+            try Address(addrProtocol: .tcp, address: "9090"),
+            try Address(addrProtocol: .ws, address: ""),
+            try Address(addrProtocol: .p2p_webrtc_star, address: ""),
+            try Address(addrProtocol: .ipfs, address: "QmW8rAgaaA6sRydK1k6vonShQME47aDxaFidbtMevWs73t")
         ])
     }
 //      it('p2p-webrtc-direct', () => {
@@ -958,10 +958,10 @@ class ProtocolsTests: XCTestCase {
         // Description should equal initialization string
         XCTAssertEqual(addr.description, str)
         XCTAssertEqual(addr.addresses, [
-            Address(addrProtocol: .ip4, address: "127.0.0.1"),
-            Address(addrProtocol: .tcp, address: "9090"),
-            Address(addrProtocol: .http, address: ""),
-            Address(addrProtocol: .p2p_webrtc_direct, address: "")
+            try Address(addrProtocol: .ip4, address: "127.0.0.1"),
+            try Address(addrProtocol: .tcp, address: "9090"),
+            try Address(addrProtocol: .http, address: ""),
+            try Address(addrProtocol: .p2p_webrtc_direct, address: "")
         ])
     }
     
@@ -977,10 +977,10 @@ class ProtocolsTests: XCTestCase {
         // Description should equal initialization string
         XCTAssertEqual(addr.description, str)
         XCTAssertEqual(addr.addresses, [
-            Address(addrProtocol: .ip4, address: "127.0.0.1"),
-            Address(addrProtocol: .tcp, address: "9090"),
-            Address(addrProtocol: .ws, address: ""),
-            Address(addrProtocol: .p2p_websocket_star, address: "")
+            try Address(addrProtocol: .ip4, address: "127.0.0.1"),
+            try Address(addrProtocol: .tcp, address: "9090"),
+            try Address(addrProtocol: .ws, address: ""),
+            try Address(addrProtocol: .p2p_websocket_star, address: "")
         ])
     }
     

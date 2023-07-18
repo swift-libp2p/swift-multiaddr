@@ -21,21 +21,46 @@ public struct Address: Equatable {
         self.address = try? unpackAddress(addressData)
     }
     
-    init(addrProtocol: MultiaddrProtocol, address: String? = nil) {
+    init(addrProtocol: MultiaddrProtocol, address: String? = nil) throws {
         self.addrProtocol = addrProtocol
-        guard let address = address, !address.isEmpty else { self.address = nil; return }
         switch addrProtocol {
         case .p2p, .ipfs:
             //Ensure addy is a valid CID or Multihash compliant String and store it as a b58 String if so...
-            self.address = (try? CID(address).multihash.b58String) ?? (try? Multihash(multihash: address).b58String)
-        default:
+            guard let address = address, !address.isEmpty else { throw MultiaddrError.parseAddressFail }
+            guard let address = (try? CID(address).multihash.b58String) ?? (try? Multihash(multihash: address).b58String) else { throw MultiaddrError.parseAddressFail }
             self.address = address
+        case .certhash:
+            // Ensure Certhash is a valid Multihash
+            guard let address = address, !address.isEmpty else { throw MultiaddrError.parseAddressFail }
+            guard (try? Multihash(multihash: address)) != nil else { throw MultiaddrError.parseAddressFail }
+            self.address = address
+        default:
+            if let address = address {
+                if address.isEmpty { self.address = nil }
+                else { self.address = address }
+            } else {
+                self.address = nil
+            }
         }
     }
     
     func binaryPacked() throws -> Data {
         let bytes = [addrProtocol.packedCode(), try binaryPackedAddress()].compactMap{$0}.flatMap{$0}
         return Data(bytes: bytes, count: bytes.count)
+    }
+    
+    public static func == (lhs: Address, rhs: Address) -> Bool {
+        switch (lhs.addrProtocol, rhs.addrProtocol) {
+        case (.certhash, .certhash):
+            do {
+                guard let leftAddress = lhs.address, let rightAddress = rhs.address else { return false }
+                return try Multihash(multihash: leftAddress).value == Multihash(multihash: rightAddress).value
+            } catch {
+                return false
+            }
+        default:
+            return lhs.addrProtocol == rhs.addrProtocol && lhs.address == rhs.address
+        }
     }
 }
 
@@ -60,6 +85,11 @@ extension Address {
             return try DNS.string(for: addressData)
         case .http, .https, .utp, .udt, .ws, .wss, .quic, .p2p_circuit:
             return nil
+        case .certhash:
+            guard !addressData.isEmpty else { throw MultiaddrError.parseAddressFail }
+            let varInt = VarInt.uVarInt(addressData.bytes)
+            guard Int(varInt.value) + varInt.bytesRead == addressData.count else { throw MultiaddrError.parseAddressFail }
+            return try Multihash(multihash: addressData.dropFirst(varInt.bytesRead)).asMultibase(.base16)
         default:
             throw MultiaddrError.parseAddressFail
         }
@@ -86,6 +116,9 @@ extension Address {
             return DNS.data(for: address)
         case .http, .https, .utp, .udt, .ws, .wss, .quic, .p2p_circuit:
             return nil
+        case .certhash:
+            let mh = try Multihash(multihash: address)
+            return Data(VarInt.putUVarInt(UInt64(mh.value.count)) + mh.value)
         default:
             throw MultiaddrError.parseAddressFail
         }

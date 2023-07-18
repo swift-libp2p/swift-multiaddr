@@ -19,11 +19,10 @@ enum BitSize {
 extension MultiaddrProtocol {
     func isMultiaddrProtocol() -> Bool {
         switch self {
-        case .ip4, .tcp, .udp, .dccp, .ip6, .ip6zone, .dns4, .dns6, .dnsaddr, .sctp, .udt, .utp, .unix, .p2p, .ipfs, .http,
-             .https, .onion, .onion3, .garlic64, .garlic32, .quic, .ws, .wss, .p2p_websocket_star, .p2p_webrtc_star, .p2p_webrtc_direct, .p2p_circuit:
+        case .ip4, .tcp, .dns, .dns4, .dns6, .dnsaddr, .udp, .dccp, .ip6, .ip6zone, .ipcidr, .quic, .quic_v1, .webtransport, .certhash, .sctp, .p2p_circuit, .udt, .utp, .unix, .p2p, .ipfs, .http, .https, .onion, .onion3, .garlic64, .garlic32, .p2p_webrtc_direct, .tls, .sni, .noise, .ws, .wss, .plaintextv2, .webrtc_direct, .webrtc:
             return true
-        //case .p2pWebsocketStar, .p2pWebrtcStar, .p2pWebrtcDirect, .p2pCircuit, .memory:
-        //    return true
+        case .p2p_websocket_star, .p2p_webrtc_star: //, .p2pWebrtcDirect, .p2pCircuit, .memory:
+            return true
         default:
             return false
         }
@@ -43,6 +42,8 @@ extension MultiaddrProtocol {
         case .onion3:
             return .fixed(bits: 296)
         case .ipfs, .dns4, .dns6, .unix, .p2p:
+            return .variable
+        case .certhash:
             return .variable
         default:
             return .zero

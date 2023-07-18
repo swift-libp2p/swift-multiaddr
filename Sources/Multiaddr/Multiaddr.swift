@@ -124,7 +124,7 @@ public struct Multiaddr: Equatable {
         /// If we found a match, replace it's Address
         if let idx = matchIndex {
             var newAddresses = self.addresses
-            newAddresses[idx] = Address(addrProtocol: codec, address: newAddress)
+            newAddresses[idx] = try Address(addrProtocol: codec, address: newAddress)
             let newMA = Multiaddr(newAddresses)
             try newMA.validate()
             return newMA
@@ -143,7 +143,7 @@ public struct Multiaddr: Equatable {
         
         /// If we found a match, replace it's Address
         if let idx = matchIndex {
-            self.addresses[idx] = Address(addrProtocol: codec, address: newAddress)
+            self.addresses[idx] = try Address(addrProtocol: codec, address: newAddress)
         } else {
             throw MultiaddrError.unknownCodec
         }
@@ -180,7 +180,7 @@ extension Multiaddr {
                 components.removeFirst()
                 addressElements.append(next)
             }
-            let newAddress = Address(addrProtocol: try MultiaddrProtocol(current), address: addressElements.combined())
+            let newAddress = try Address(addrProtocol: MultiaddrProtocol(current), address: addressElements.combined())
             addresses.append(newAddress)
         }
         return addresses
@@ -199,7 +199,7 @@ extension Multiaddr {
             guard let proto = try? MultiaddrProtocol(decodedVarint.value) else { throw MultiaddrError.unknownProtocol }
 
             if case .zero = proto.size() {
-                addresses.append(Address(addrProtocol: proto))
+                addresses.append(try Address(addrProtocol: proto))
                 continue
             }
             
@@ -207,7 +207,7 @@ extension Multiaddr {
             let addressBytes = Data(buffer.prefix(addressSize))
             let address = Address(addrProtocol: proto, addressData: addressBytes)
             addresses.append(address)
-            
+                    
             buffer.removeFirst(addressSize)
         }
         
@@ -222,7 +222,8 @@ extension Multiaddr {
 
 extension Multiaddr: Hashable {
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(self.description)
+        //hasher.combine(self.description)
+        hasher.combine(try! self.binaryPacked())
     }
 }
 
