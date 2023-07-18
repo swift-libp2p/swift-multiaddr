@@ -37,6 +37,20 @@ public struct Address: Equatable {
         let bytes = [addrProtocol.packedCode(), try binaryPackedAddress()].compactMap{$0}.flatMap{$0}
         return Data(bytes: bytes, count: bytes.count)
     }
+    
+    public static func == (lhs: Address, rhs: Address) -> Bool {
+        switch (lhs.addrProtocol, rhs.addrProtocol) {
+        case (.certhash, .certhash):
+            do {
+                guard let leftAddress = lhs.address, let rightAddress = rhs.address else { return false }
+                return try Multihash(multihash: leftAddress).value == Multihash(multihash: rightAddress).value
+            } catch {
+                return false
+            }
+        default:
+            return lhs.addrProtocol == rhs.addrProtocol && lhs.address == rhs.address
+        }
+    }
 }
 
 extension Address {
