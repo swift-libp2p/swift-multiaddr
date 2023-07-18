@@ -60,6 +60,11 @@ extension Address {
             return try DNS.string(for: addressData)
         case .http, .https, .utp, .udt, .ws, .wss, .quic, .p2p_circuit:
             return nil
+        case .certhash:
+            guard !addressData.isEmpty else { throw MultiaddrError.parseAddressFail }
+            let varInt = VarInt.uVarInt(addressData.bytes)
+            guard Int(varInt.value) + varInt.bytesRead == addressData.count else { throw MultiaddrError.parseAddressFail }
+            return try Multihash(multihash: addressData.dropFirst(varInt.bytesRead)).asMultibase(.base16)
         default:
             throw MultiaddrError.parseAddressFail
         }
@@ -86,6 +91,9 @@ extension Address {
             return DNS.data(for: address)
         case .http, .https, .utp, .udt, .ws, .wss, .quic, .p2p_circuit:
             return nil
+        case .certhash:
+            let mh = try Multihash(multihash: address)
+            return Data(VarInt.putUVarInt(UInt64(mh.value.count)) + mh.value)
         default:
             throw MultiaddrError.parseAddressFail
         }
