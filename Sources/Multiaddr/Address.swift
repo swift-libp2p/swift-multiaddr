@@ -21,15 +21,26 @@ public struct Address: Equatable {
         self.address = try? unpackAddress(addressData)
     }
     
-    init(addrProtocol: MultiaddrProtocol, address: String? = nil) {
+    init(addrProtocol: MultiaddrProtocol, address: String? = nil) throws {
         self.addrProtocol = addrProtocol
-        guard let address = address, !address.isEmpty else { self.address = nil; return }
         switch addrProtocol {
         case .p2p, .ipfs:
             //Ensure addy is a valid CID or Multihash compliant String and store it as a b58 String if so...
-            self.address = (try? CID(address).multihash.b58String) ?? (try? Multihash(multihash: address).b58String)
-        default:
+            guard let address = address, !address.isEmpty else { throw MultiaddrError.parseAddressFail }
+            guard let address = (try? CID(address).multihash.b58String) ?? (try? Multihash(multihash: address).b58String) else { throw MultiaddrError.parseAddressFail }
             self.address = address
+        case .certhash:
+            // Ensure Certhash is a valid Multihash
+            guard let address = address, !address.isEmpty else { throw MultiaddrError.parseAddressFail }
+            guard (try? Multihash(multihash: address)) != nil else { throw MultiaddrError.parseAddressFail }
+            self.address = address
+        default:
+            if let address = address {
+                if address.isEmpty { self.address = nil }
+                else { self.address = address }
+            } else {
+                self.address = nil
+            }
         }
     }
     
