@@ -13,12 +13,16 @@ public struct Multiaddr: Equatable {
     public private(set) var addresses: [Address] = []
     
     public init(_ string: String) throws {
+        guard !string.isEmpty else { throw MultiaddrError.invalidFormat }
         addresses = try createAddresses(from: string)
+        guard !self.addresses.isEmpty else { throw MultiaddrError.parseAddressFail }
         try validate()
     }
     
     public init(_ bytes: Data) throws {
+        guard !bytes.isEmpty else { throw MultiaddrError.invalidFormat }
         self.addresses = try createAddresses(fromData: bytes)
+        guard !self.addresses.isEmpty else { throw MultiaddrError.parseAddressFail }
     }
     
     public init(_ proto: MultiaddrProtocol, address: String?) throws {
@@ -74,6 +78,7 @@ public struct Multiaddr: Equatable {
     /// Returns a new `Multiaddr`, removing the last occurance of the protocol and all subsequent addresses.
     public func decapsulate(_ other: String) -> Multiaddr {
         let protoName = other.hasPrefix("/") ? String(other.dropFirst()) : other
+        //guard let codec = try? Codecs(protoName) else { return self }
         if let lastMatch = addresses.lastIndex(where: { $0.addrProtocol.name == protoName }) {
             return Multiaddr(Array(addresses[..<lastMatch]))
         } else {
@@ -110,6 +115,14 @@ public struct Multiaddr: Equatable {
         })?.address {
             return "/" + path
         } else { return nil }
+    }
+    
+    public func getFirstAddress(forCodec codec:MultiaddrProtocol) -> Address? {
+        return self.addresses.first(where: { $0.codec.isEqual(codec) })
+    }
+    
+    public func getAddresses(forCodec codec:MultiaddrProtocol) -> [Address] {
+        return self.addresses.compactMap { if $0.codec.isEqual(codec) { return $0 } else { return nil } }
     }
     
     /// Returns a new Multiaddr replacing the Address associated with the specified codec
