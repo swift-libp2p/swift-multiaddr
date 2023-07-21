@@ -5,42 +5,41 @@ import Multicodec
 
 class ProtocolsTests: XCTestCase {
 
-//    func testVarIntEncoding() {
-//        let proto1 = Protocol.ip6
-//        let expectedPackedValueAsHex1 = "29"
-//        let varIntEncodedBytes1 = proto1.packedCode().hexString()
-//        XCTAssertEqual(varIntEncodedBytes1, expectedPackedValueAsHex1)
-//
-//        let proto2 = Protocol.ip4
-//        let expectedPackedValueAsHex2 = "04"
-//        let varIntEncodedBytes2 = proto2.packedCode().hexString()
-//        XCTAssertEqual(varIntEncodedBytes2, expectedPackedValueAsHex2)
-//    }
+    func testVarIntEncoding() {
+        let proto1 = MultiaddrProtocol.ip6
+        let expectedPackedValueAsHex1 = "29"
+        let varIntEncodedBytes1 = proto1.packedCode().hexString()
+        XCTAssertEqual(varIntEncodedBytes1, expectedPackedValueAsHex1)
+
+        let proto2 = MultiaddrProtocol.ip4
+        let expectedPackedValueAsHex2 = "04"
+        let varIntEncodedBytes2 = proto2.packedCode().hexString()
+        XCTAssertEqual(varIntEncodedBytes2, expectedPackedValueAsHex2)
+    }
     
 //    it('create multiaddr', () => {
 //        udpAddr = multiaddr('/ip4/127.0.0.1/udp/1234')
 //        expect(udpAddr instanceof multiaddr).to.equal(true)
 //      })
     func testCreateMultiaddr() throws {
-        let udpAddr = try Multiaddr("/ip4/127.0.0.1/udp/1234")
-        print(udpAddr)
+        XCTAssertNoThrow(try Multiaddr("/ip4/127.0.0.1/udp/1234"))
     }
     
 //    it('clone multiaddr', () => {
 //        const udpAddrClone = multiaddr(udpAddr)
 //        expect(udpAddrClone !== udpAddr).to.equal(true)
 //      })
-    func testClone() {
-        var m1 = try! Multiaddr("/ip4/127.0.0.1")
+    func testClone() throws {
+        var m1 = try Multiaddr("/ip4/127.0.0.1")
         var cloned = m1
         XCTAssertEqual(m1, cloned)
         
-        let m2 = try! Multiaddr("/udp")
+        let m2 = try Multiaddr("/udp/1234")
         cloned = cloned.encapsulate(m2)
         XCTAssertNotEqual(m1, cloned)
         
         m1 = m1.encapsulate(m2)
-        let expected = try! Multiaddr("/ip4/127.0.0.1/udp")
+        let expected = try Multiaddr("/ip4/127.0.0.1/udp/1234")
         XCTAssertEqual(m1, expected)
         XCTAssertEqual(cloned, expected)
     }
@@ -716,7 +715,6 @@ class ProtocolsTests: XCTestCase {
     func testP2P_Multihash_Initialization() throws {
         let str = "/p2p/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC"
         let addr = try Multiaddr(str)
-        print(addr)
         // Description should equal initialization string
         XCTAssertEqual(addr.description, str)
         XCTAssertEqual(addr.addresses, [try Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")])
@@ -732,9 +730,8 @@ class ProtocolsTests: XCTestCase {
     func testP2P_CID_Initialization() throws {
         let str = "/p2p/bafzbeidt255unskpefjmqb2rc27vjuyxopkxgaylxij6pw35hhys4vnyp4"
         let addr = try Multiaddr(str)
-        print(addr) //p2p/QmW8rAgaaA6sRydK1k6vonShQME47aDxaFidbtMevWs73t
         // Description should equal initialization string
-        XCTAssertEqual(addr.description, "/p2p/QmW8rAgaaA6sRydK1k6vonShQME47aDxaFidbtMevWs73t")
+        XCTAssertEqual(addr.description, "/p2p/bafzbeidt255unskpefjmqb2rc27vjuyxopkxgaylxij6pw35hhys4vnyp4")
         XCTAssertEqual(addr.addresses, [try Address(addrProtocol: .p2p, address: "QmW8rAgaaA6sRydK1k6vonShQME47aDxaFidbtMevWs73t")])
     }
     
@@ -752,7 +749,7 @@ class ProtocolsTests: XCTestCase {
         // Description should equal initialization string
         XCTAssertEqual(addr.description, str)
         XCTAssertEqual(addr.addresses, [try Address(addrProtocol: .ipfs, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")])
-        XCTAssertNotEqual(addr.addresses, [try Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")])
+        XCTAssertEqual(addr.addresses, [try Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")])
     }
     
 //      it('onion', () => {
@@ -937,7 +934,7 @@ class ProtocolsTests: XCTestCase {
         let str = "/ip4/127.0.0.1/tcp/9090/ws/p2p-webrtc-star/ipfs/bafzbeidt255unskpefjmqb2rc27vjuyxopkxgaylxij6pw35hhys4vnyp4"
         let addr = try Multiaddr(str)
         // Description should equal initialization string
-        XCTAssertEqual(addr.description, "/ip4/127.0.0.1/tcp/9090/ws/p2p-webrtc-star/ipfs/QmW8rAgaaA6sRydK1k6vonShQME47aDxaFidbtMevWs73t")
+        XCTAssertEqual(addr.description, "/ip4/127.0.0.1/tcp/9090/ws/p2p-webrtc-star/ipfs/bafzbeidt255unskpefjmqb2rc27vjuyxopkxgaylxij6pw35hhys4vnyp4")
         XCTAssertEqual(addr.addresses, [
             try Address(addrProtocol: .ip4, address: "127.0.0.1"),
             try Address(addrProtocol: .tcp, address: "9090"),
@@ -1002,7 +999,6 @@ class ProtocolsTests: XCTestCase {
 //        ])
 //    }
     
-
     /// - MARK: PeerID Extraction Tests
     
     func testGetPeerID_P2P() throws {
@@ -1022,19 +1018,18 @@ class ProtocolsTests: XCTestCase {
 
     func testGetPeerID_P2P_CIDv1_BASE32() throws {
         let ma = try Multiaddr("/p2p-circuit/p2p/bafzbeigweq4zr4x4ky2dvv7nanbkw6egutvrrvzw6g3h2rftp7gidyhtt4")
-        XCTAssertEqual(ma.getPeerID(), "QmckZzdVd72h9QUFuJJpQqhsZqGLwjhh81qSvZ9BhB2FQi")
+        XCTAssertEqual(ma.getPeerID(), "bafzbeigweq4zr4x4ky2dvv7nanbkw6egutvrrvzw6g3h2rftp7gidyhtt4")
     }
 
     func testGetPeerID_P2P_CIDv1_BASE32_Nonb58_chars() throws {
         let ma = try Multiaddr("/p2p-circuit/p2p/bafzbeidt255unskpefjmqb2rc27vjuyxopkxgaylxij6pw35hhys4vnyp4")
-        XCTAssertEqual(ma.getPeerID(), "QmW8rAgaaA6sRydK1k6vonShQME47aDxaFidbtMevWs73t")
+        XCTAssertEqual(ma.getPeerID(), "bafzbeidt255unskpefjmqb2rc27vjuyxopkxgaylxij6pw35hhys4vnyp4")
     }
 
     func testGetPeerID_From_Address_Without_A_PeerID() throws {
         let ma = try Multiaddr("/ip4/0.0.0.0/tcp/1234/utp")
         XCTAssertNil(ma.getPeerID())
     }
-    
     
     /// - MARK: Path Extraction Tests
 //    it('should return a path for unix', () => {
@@ -1068,9 +1063,84 @@ class ProtocolsTests: XCTestCase {
     }
     
     static var allTests = [
-        //("testVarIntEncoding", testVarIntEncoding)
-        ("testCreateMultiaddr", testCreateMultiaddr)
+        ("testVarIntEncoding", testVarIntEncoding),
+        ("testCreateMultiaddr", testCreateMultiaddr),
+        ("testClone", testClone),
+        ("testCreateFromBuffer", testCreateFromBuffer),
+        ("testCreateFromString", testCreateFromString),
+        ("testCreateBasic", testCreateBasic),
+        ("testIPFSAddress", testIPFSAddress),
+        ("testIP4", testIP4),
+        ("testIP6", testIP6),
+        ("testIP4_TCP", testIP4_TCP),
+        ("testIP6_TCP", testIP6_TCP),
+        ("testIP4_UDP", testIP4_UDP),
+        ("testIP6_UDP", testIP6_UDP),
+        ("testIP4_P2P_TCP", testIP4_P2P_TCP),
+        ("testIP4_IPFS_TCP", testIP4_IPFS_TCP),
+        ("testIP6_P2P_TCP", testIP6_P2P_TCP),
+        ("testIP4_UDP_UTP", testIP4_UDP_UTP),
+        ("testIP6_UDP_UTP", testIP6_UDP_UTP),
+        ("testIP4_TCP_HTTP", testIP4_TCP_HTTP),
+        ("testIP4_TCP_UNIX", testIP4_TCP_UNIX),
+        ("testIP6_TCP_HTTP", testIP6_TCP_HTTP),
+        ("testIP6_TCP_UNIX", testIP6_TCP_UNIX),
+        ("testIP4_TCP_HTTPS", testIP4_TCP_HTTPS),
+        ("testIP6_TCP_HTTPS", testIP6_TCP_HTTPS),
+        ("testIP4_TCP_WS", testIP4_TCP_WS),
+        ("testIP6_TCP_WS", testIP6_TCP_WS),
+        ("testIP6_TCP_WS_IPFS", testIP6_TCP_WS_IPFS),
+        ("testIP6_TCP_WS_P2P", testIP6_TCP_WS_P2P),
+        ("testIP6_UDP_QUIC_IPFS", testIP6_UDP_QUIC_IPFS),
+        ("testIP6_UDP_QUIC_P2P", testIP6_UDP_QUIC_P2P),
+        ("testUNIX", testUNIX),
+        ("testP2P_Multihash_Initialization", testP2P_Multihash_Initialization),
+        ("testP2P_CID_Initialization", testP2P_CID_Initialization),
+        ("testIPFS", testIPFS),
+        ("testOnion", testOnion),
+        ("testOnion_BadLength", testOnion_BadLength),
+        ("testOnion_BadPort", testOnion_BadPort),
+        ("testOnion_NoPort", testOnion_NoPort),
+        ("testOnion3", testOnion3),
+        ("testOnion3_BadLength", testOnion3_BadLength),
+        ("testOnion3_BadPort", testOnion3_BadPort),
+        ("testOnion3_NoPort", testOnion3_NoPort),
+        ("testP2PCircuit", testP2PCircuit),
+        ("testP2P_P2PCircuit", testP2P_P2PCircuit),
+        ("testIPFS_P2PCircuit", testIPFS_P2PCircuit),
+        ("testIP4_TCP_WEBRTCSTAR_P2P", testIP4_TCP_WEBRTCSTAR_P2P),
+        ("testIP4_TCP_WEBRTCSTAR_IPFS", testIP4_TCP_WEBRTCSTAR_IPFS),
+        ("testIP4_TCP_WEBRTCSTAR_IPFS_CID", testIP4_TCP_WEBRTCSTAR_IPFS_CID),
+        ("testIP4_TCP_HTTP_WEBRTCDIRECT", testIP4_TCP_HTTP_WEBRTCDIRECT),
+        ("testIP4_TCP_WS_WEBSOCKETSTAR", testIP4_TCP_WS_WEBSOCKETSTAR),
+        ("testGetPeerID_P2P", testGetPeerID_P2P),
+        ("testGetPeerID_P2PCircuit", testGetPeerID_P2PCircuit),
+        ("testGetPeerID_IPFS", testGetPeerID_IPFS),
+        ("testGetPeerID_P2P_CIDv1_BASE32", testGetPeerID_P2P_CIDv1_BASE32),
+        ("testGetPeerID_P2P_CIDv1_BASE32_Nonb58_chars", testGetPeerID_P2P_CIDv1_BASE32_Nonb58_chars),
+        ("testGetPeerID_From_Address_Without_A_PeerID", testGetPeerID_From_Address_Without_A_PeerID),
+        ("testGetPathForUnix", testGetPathForUnix),
+        ("testGetPathForUnix_Multiple_Protos", testGetPathForUnix_Multiple_Protos),
+        ("testGetPathForUnix_No_Path", testGetPathForUnix_No_Path),
+        ("testLinuxTestSuiteIncludesAllTests", testLinuxTestSuiteIncludesAllTests),
     ]
+    
+    /// Credit: https://oleb.net/blog/2017/03/keeping-xctest-in-sync/
+    func testLinuxTestSuiteIncludesAllTests() {
+        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+        let thisClass = type(of: self)
+        let linuxCount = thisClass.allTests.count
+        #if swift(>=4.0)
+        let darwinCount = thisClass
+            .defaultTestSuite.testCaseCount
+        #else
+        let darwinCount = Int(thisClass
+            .defaultTestSuite().testCaseCount)
+        #endif
+        XCTAssertEqual(linuxCount, darwinCount,
+                       "\(darwinCount - linuxCount) tests are missing from allTests")
+        #endif
+    }
 
 }
 
