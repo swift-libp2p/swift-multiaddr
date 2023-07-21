@@ -23,7 +23,6 @@ let package = Package(
         .package(url: "https://github.com/swift-libp2p/swift-multibase.git", .upToNextMajor(from: "0.0.1")),
         .package(url: "https://github.com/swift-libp2p/swift-multihash.git", .upToNextMajor(from: "0.0.1")),
         .package(url: "https://github.com/swift-libp2p/swift-cid.git", .upToNextMajor(from: "0.0.1"))
-        //.package(name: "PeerID", path: "../PeerID")
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
