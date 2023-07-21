@@ -1,6 +1,6 @@
 //
 //  Error+Multiaddr.swift
-//  
+//
 //  Created by Luke Reichold
 //  Modified by Brandon Toms on 5/1/22.
 //
@@ -14,6 +14,7 @@ enum MultiaddrError: Error {
     case parseIPv6AddressFail
     case invalidPortValue
     case invalidOnionHostAddress
+    case invalidGarlicAddress
     case unknownProtocol
     case ipfsAddressLengthConflict
     case unknownCodec
