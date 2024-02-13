@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/swift-libp2p/swift-cid.git",
         "state": {
           "branch": null,
-          "revision": "b6b54fc371815eaad55e5b2169605b25541841f1",
-          "version": "0.0.3"
+          "revision": "8af5d9de451ceaf45a42e9d6784054d8f5fa3544",
+          "version": "0.0.4"
         }
       },
       {
