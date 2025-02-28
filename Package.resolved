@@ -60,8 +60,8 @@
         "repositoryURL": "https://github.com/swift-libp2p/swift-varint.git",
         "state": {
           "branch": null,
-          "revision": "3d1e3c9ca4824d5acaf40ff46e96c0b956599271",
-          "version": "0.0.1"
+          "revision": "1ea4cd2ea5f1c74527600de659f0805d2e12fa6b",
+          "version": "0.0.2"
         }
       }
     ]
