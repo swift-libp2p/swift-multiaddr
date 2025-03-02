@@ -34,7 +34,6 @@ struct Onion {
         guard let portValue = UInt16(port) else { throw MultiaddrError.invalidPortValue }
         guard portValue != 0 else { throw MultiaddrError.invalidPortValue }
 
-        //base32DecodeToData(host)
         guard var onionData = try? BaseEncoding.decode(host, as: .base32).data else {
             throw MultiaddrError.invalidOnionHostAddress
         }
@@ -48,12 +47,14 @@ struct Onion {
 
     static func string(for data: Data) throws -> String {
         guard data.count == 12 else { throw MultiaddrError.invalidOnionHostAddress }
-        let addressBytes = data.prefix(10)
-        let portBytes = data.suffix(2)
 
-        //base32Encode(addressBytes).lowercased()
+        let addressBytes = data.prefix(10)
         let addressEncodedString = addressBytes.asString(base: .base32).lowercased()
-        let portString = String(portBytes.uint16.bigEndian)
+
+        let portBytes = data.suffix(2)
+        guard let port = portBytes.uint16 else { throw MultiaddrError.invalidPortValue }
+        let portString = String(port.bigEndian)
+
         return "\(addressEncodedString):\(portString)"
     }
 }
@@ -73,7 +74,6 @@ struct Onion3 {
         guard let portValue = UInt16(port) else { throw MultiaddrError.invalidPortValue }
         guard portValue != 0 else { throw MultiaddrError.invalidPortValue }
 
-        //base32DecodeToData(host)
         guard var onionData = try? BaseEncoding.decode(host, as: .base32).data else {
             throw MultiaddrError.invalidOnionHostAddress
         }
@@ -88,11 +88,12 @@ struct Onion3 {
     static func string(for data: Data) throws -> String {
         //guard data.count == 52 else { throw MultiaddrError.invalidOnionHostAddress }
         let portBytes = Data(data.suffix(2))
-        let addressBytes = Data(data.dropLast(2))
+        guard let port = portBytes.uint16 else { throw MultiaddrError.invalidPortValue }
+        let portString = String(port.bigEndian)
 
-        //base32Encode(addressBytes).lowercased()
+        let addressBytes = Data(data.dropLast(2))
         let addressEncodedString = addressBytes.asString(base: .base32).lowercased()
-        let portString = String(portBytes.uint16.bigEndian)
+
         return "\(addressEncodedString):\(portString)"
     }
 }

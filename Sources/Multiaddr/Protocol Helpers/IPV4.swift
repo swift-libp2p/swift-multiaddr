@@ -41,8 +41,11 @@ struct IPv4 {
         guard data.count == MemoryLayout<UInt32>.size else {
             throw MultiaddrError.parseIPv4AddressFail
         }
+        guard let uint32 = data.uint32 else {
+            throw MultiaddrError.parseIPv4AddressFail
+        }
         var output = Data(count: Int(INET_ADDRSTRLEN))
-        var address = in_addr(s_addr: data.uint32)
+        var address = in_addr(s_addr: uint32)
 
         guard
             let presentationBytes = output.withUnsafeMutableBytes({
@@ -56,14 +59,6 @@ struct IPv4 {
             return "Invalid IPv4 address"
         }
         return String(cString: presentationBytes)
-    }
-}
-
-extension Data {
-    var uint32: UInt32 {
-        withUnsafeBytes {
-            $0.load(as: UInt32.self)
-        }
     }
 }
 
