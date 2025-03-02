@@ -59,14 +59,6 @@ struct IPv4 {
     }
 }
 
-extension Data {
-    var uint32: UInt32 {
-        withUnsafeBytes {
-            $0.load(as: UInt32.self)
-        }
-    }
-}
-
 extension BinaryInteger {
     // returns little endian; use .bigEndian.bytes for BE.
     var bytes: Data {
