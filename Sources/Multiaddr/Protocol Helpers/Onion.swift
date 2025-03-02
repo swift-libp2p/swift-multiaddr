@@ -25,8 +25,8 @@ struct Onion {
         guard components.count == 2 else { throw MultiaddrError.invalidFormat }
 
         guard let host = components.first?.uppercased(),
-              host.count == 16,
-              let port = components.last
+            host.count == 16,
+            let port = components.last
         else {
             throw MultiaddrError.invalidOnionHostAddress
         }
@@ -35,7 +35,9 @@ struct Onion {
         guard portValue != 0 else { throw MultiaddrError.invalidPortValue }
 
         //base32DecodeToData(host)
-        guard var onionData = try? BaseEncoding.decode(host, as: .base32).data else { throw MultiaddrError.invalidOnionHostAddress }
+        guard var onionData = try? BaseEncoding.decode(host, as: .base32).data else {
+            throw MultiaddrError.invalidOnionHostAddress
+        }
 
         var bigEndianPort = portValue.bigEndian
         let portData = Data(bytes: &bigEndianPort, count: MemoryLayout<UInt16>.size)
@@ -49,7 +51,7 @@ struct Onion {
         let addressBytes = data.prefix(10)
         let portBytes = data.suffix(2)
 
-        let addressEncodedString = addressBytes.asString(base: .base32).lowercased() //base32Encode(addressBytes).lowercased()
+        let addressEncodedString = addressBytes.asString(base: .base32).lowercased()  //base32Encode(addressBytes).lowercased()
         let portString = String(portBytes.uint16.bigEndian)
         return "\(addressEncodedString):\(portString)"
     }
@@ -61,8 +63,8 @@ struct Onion3 {
         guard components.count == 2 else { throw MultiaddrError.invalidFormat }
 
         guard let host = components.first?.uppercased(),
-              host.count == 56,
-              let port = components.last
+            host.count == 56,
+            let port = components.last
         else {
             throw MultiaddrError.invalidOnionHostAddress
         }
@@ -71,7 +73,9 @@ struct Onion3 {
         guard portValue != 0 else { throw MultiaddrError.invalidPortValue }
 
         //base32DecodeToData(host)
-        guard var onionData = try? BaseEncoding.decode(host, as: .base32).data else { throw MultiaddrError.invalidOnionHostAddress }
+        guard var onionData = try? BaseEncoding.decode(host, as: .base32).data else {
+            throw MultiaddrError.invalidOnionHostAddress
+        }
 
         var bigEndianPort = portValue.bigEndian
         let portData = Data(bytes: &bigEndianPort, count: MemoryLayout<UInt16>.size)
@@ -85,7 +89,7 @@ struct Onion3 {
         let portBytes = Data(data.suffix(2))
         let addressBytes = Data(data.dropLast(2))
 
-        let addressEncodedString = addressBytes.asString(base: .base32).lowercased() //base32Encode(addressBytes).lowercased()
+        let addressEncodedString = addressBytes.asString(base: .base32).lowercased()  //base32Encode(addressBytes).lowercased()
         let portString = String(portBytes.uint16.bigEndian)
         return "\(addressEncodedString):\(portString)"
     }

@@ -19,13 +19,14 @@ let package = Package(
     name: "swift-multiaddr",
     platforms: [
         .iOS(.v12),
-        .macOS(.v10_14)
+        .macOS(.v10_14),
     ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
             name: "Multiaddr",
-            targets: ["Multiaddr"]),
+            targets: ["Multiaddr"]
+        )
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -34,7 +35,7 @@ let package = Package(
         .package(url: "https://github.com/swift-libp2p/swift-multicodec.git", .upToNextMajor(from: "0.0.1")),
         .package(url: "https://github.com/swift-libp2p/swift-multibase.git", .upToNextMajor(from: "0.0.1")),
         .package(url: "https://github.com/swift-libp2p/swift-multihash.git", .upToNextMajor(from: "0.0.1")),
-        .package(url: "https://github.com/swift-libp2p/swift-cid.git", .upToNextMajor(from: "0.0.1"))
+        .package(url: "https://github.com/swift-libp2p/swift-cid.git", .upToNextMajor(from: "0.0.1")),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -47,9 +48,11 @@ let package = Package(
                 .product(name: "Multibase", package: "swift-multibase"),
                 .product(name: "Multihash", package: "swift-multihash"),
                 .product(name: "CID", package: "swift-cid"),
-            ]),
+            ]
+        ),
         .testTarget(
             name: "MultiaddrTests",
-            dependencies: ["Multiaddr"]),
+            dependencies: ["Multiaddr"]
+        ),
     ]
 )
