@@ -95,7 +95,8 @@ extension Address {
         switch addrProtocol {
         case .tcp, .udp, .dccp, .sctp:
             guard addressData.count == 2 else { throw MultiaddrError.parseAddressFail }
-            return String(addressData.uint16.bigEndian)
+            guard let uint16 = addressData.uint16 else { throw MultiaddrError.parseAddressFail }
+            return String(uint16.bigEndian)
         case .ip4:
             return try IPv4.string(for: addressData)
         case .ip6:
