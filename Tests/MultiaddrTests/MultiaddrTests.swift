@@ -486,7 +486,8 @@ final class MultiaddrTests: XCTestCase {
             "/ip4/127.0.0.1/quic/1234",
             "/ip4/127.0.0.1/quic-v1/1234",
             "/ip4/127.0.0.1/udp/1234/quic-v1/webtransport/certhash",
-            "/ip4/127.0.0.1/udp/1234/quic-v1/webtransport/certhash/b2uaraocy6yrdblb4sfptaddgimjmmp",  // 1 character missing from certhash
+            // 1 character missing from certhash
+            "/ip4/127.0.0.1/udp/1234/quic-v1/webtransport/certhash/b2uaraocy6yrdblb4sfptaddgimjmmp",
             "/ip4/127.0.0.1/ipfs",
             "/ip4/127.0.0.1/ipfs/tcp",
             "/ip4/127.0.0.1/p2p",

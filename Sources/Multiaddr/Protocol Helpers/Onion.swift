@@ -51,7 +51,8 @@ struct Onion {
         let addressBytes = data.prefix(10)
         let portBytes = data.suffix(2)
 
-        let addressEncodedString = addressBytes.asString(base: .base32).lowercased()  //base32Encode(addressBytes).lowercased()
+        //base32Encode(addressBytes).lowercased()
+        let addressEncodedString = addressBytes.asString(base: .base32).lowercased()
         let portString = String(portBytes.uint16.bigEndian)
         return "\(addressEncodedString):\(portString)"
     }
@@ -89,7 +90,8 @@ struct Onion3 {
         let portBytes = Data(data.suffix(2))
         let addressBytes = Data(data.dropLast(2))
 
-        let addressEncodedString = addressBytes.asString(base: .base32).lowercased()  //base32Encode(addressBytes).lowercased()
+        //base32Encode(addressBytes).lowercased()
+        let addressEncodedString = addressBytes.asString(base: .base32).lowercased()
         let portString = String(portBytes.uint16.bigEndian)
         return "\(addressEncodedString):\(portString)"
     }

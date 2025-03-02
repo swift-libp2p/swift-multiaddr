@@ -122,21 +122,25 @@ class ProtocolsTests: XCTestCase {
         /// Decapsulation via new Multiaddress
         let udpAddrBytes2 = try udpAddr.encapsulate("/udp/5678")
         XCTAssertEqual(udpAddrBytes2.description, "/ip4/127.0.0.1/udp/1234/udp/5678")
-        XCTAssertEqual(udpAddrBytes2.decapsulate(try Multiaddr("/udp/5678")).description, "/ip4/127.0.0.1/udp/1234")  // TODO: Should Support just "/udp"
-        XCTAssertEqual(udpAddrBytes2.decapsulate(try Multiaddr("/ip4/127.0.0.1")).description, "/")  //TODO: Should Support just "/ip4"
+        // TODO: Should Support just "/udp"
+        XCTAssertEqual(udpAddrBytes2.decapsulate(try Multiaddr("/udp/5678")).description, "/ip4/127.0.0.1/udp/1234")
+        // TODO: Should Support just "/ip4"
+        XCTAssertEqual(udpAddrBytes2.decapsulate(try Multiaddr("/ip4/127.0.0.1")).description, "/")
 
         /// Decapsulation via String Protocol
         let udpAddrBytes3 = try udpAddr.encapsulate("/udp/5678")
         XCTAssertEqual(udpAddrBytes3.description, "/ip4/127.0.0.1/udp/1234/udp/5678")
         XCTAssertEqual(udpAddrBytes3.decapsulate("/udp").description, "/ip4/127.0.0.1/udp/1234")
-        XCTAssertEqual(udpAddrBytes3.decapsulate("/udp").decapsulate("/udp").description, "/ip4/127.0.0.1")  //Decapsulate isn't mutating so it must be called twice...
+        //Decapsulate isn't mutating so it must be called twice...
+        XCTAssertEqual(udpAddrBytes3.decapsulate("/udp").decapsulate("/udp").description, "/ip4/127.0.0.1")
         XCTAssertEqual(udpAddrBytes3.decapsulate("/ip4").description, "/")
 
         /// Decapsulation via MultiaddrProtocol (akak Codec)
         let udpAddrBytes4 = try udpAddr.encapsulate(proto: .udp, address: "5678")
         XCTAssertEqual(udpAddrBytes4.description, "/ip4/127.0.0.1/udp/1234/udp/5678")
         XCTAssertEqual(udpAddrBytes4.decapsulate(.udp).description, "/ip4/127.0.0.1/udp/1234")
-        XCTAssertEqual(udpAddrBytes4.decapsulate(.udp).decapsulate(.udp).description, "/ip4/127.0.0.1")  //Decapsulate isn't mutating so it must be called twice...
+        //Decapsulate isn't mutating so it must be called twice...
+        XCTAssertEqual(udpAddrBytes4.decapsulate(.udp).decapsulate(.udp).description, "/ip4/127.0.0.1")
         XCTAssertEqual(udpAddrBytes4.decapsulate(.ip4).description, "/")
 
         /// - TODO: Support Instantiating with a single "/"
