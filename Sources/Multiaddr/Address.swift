@@ -1,33 +1,49 @@
+//===----------------------------------------------------------------------===//
 //
-//  Address.swift
+// This source file is part of the swift-libp2p open source project
+//
+// Copyright (c) 2022-2025 swift-libp2p project authors
+// Licensed under MIT
+//
+// See LICENSE for license information
+// See CONTRIBUTORS for the list of swift-libp2p project authors
+//
+// SPDX-License-Identifier: MIT
+//
+//===----------------------------------------------------------------------===//
 //
 //  Created by Luke Reichold
 //  Modified by Brandon Toms on 5/1/22.
 //
 
+import CID
 import Foundation
-import VarInt
 import Multicodec
 import Multihash
-import CID
+import VarInt
 
 public struct Address: Equatable {
     let addrProtocol: MultiaddrProtocol
     let address: String?
-    
+
     init(addrProtocol: MultiaddrProtocol, addressData: Data) {
         self.addrProtocol = addrProtocol
-        guard !addressData.isEmpty else { self.address = nil; return }
+        guard !addressData.isEmpty else {
+            self.address = nil
+            return
+        }
         self.address = try? Address.unpackAddress(addressData, for: addrProtocol)
     }
-    
+
     init(addrProtocol: MultiaddrProtocol, address: String? = nil) throws {
         self.addrProtocol = addrProtocol
         switch addrProtocol {
         case .p2p, .ipfs:
             //Ensure addy is a valid CID or Multihash compliant String and store it as a b58 String if so...
             guard let address = address, !address.isEmpty else { throw MultiaddrError.parseAddressFail }
-            guard ((try? CID(address)) != nil) || ((try? Multihash(multihash: address)) != nil) else { throw MultiaddrError.parseAddressFail }
+            guard ((try? CID(address)) != nil) || ((try? Multihash(multihash: address)) != nil) else {
+                throw MultiaddrError.parseAddressFail
+            }
             self.address = address
         case .certhash:
             // Ensure Certhash is a valid Multihash
@@ -37,20 +53,20 @@ public struct Address: Equatable {
         default:
             if var address = address {
                 if address.hasSuffix("/") { address.removeLast() }
-                if address.isEmpty { self.address = nil }
-                else { self.address = address }
+                if address.isEmpty { self.address = nil } else { self.address = address }
             } else {
                 self.address = nil
             }
         }
         let _ = try Address.binaryPackedAddress(self.address, for: self.addrProtocol)
     }
-    
+
     func binaryPacked() throws -> Data {
-        let bytes = [addrProtocol.packedCode(), try Address.binaryPackedAddress(self.address, for: self.addrProtocol)].compactMap{$0}.flatMap{$0}
+        let bytes = [addrProtocol.packedCode(), try Address.binaryPackedAddress(self.address, for: self.addrProtocol)]
+            .compactMap { $0 }.flatMap { $0 }
         return Data(bytes: bytes, count: bytes.count)
     }
-    
+
     public static func == (lhs: Address, rhs: Address) -> Bool {
         switch (lhs.addrProtocol, rhs.addrProtocol) {
         case (.certhash, .certhash):
@@ -74,8 +90,8 @@ public struct Address: Equatable {
 }
 
 extension Address {
-    
-    static private func unpackAddress(_ addressData: Data, for addrProtocol:MultiaddrProtocol) throws -> String? {
+
+    static private func unpackAddress(_ addressData: Data, for addrProtocol: MultiaddrProtocol) throws -> String? {
         switch addrProtocol {
         case .tcp, .udp, .dccp, .sctp:
             guard addressData.count == 2 else { throw MultiaddrError.parseAddressFail }
@@ -87,8 +103,12 @@ extension Address {
         case .ip6zone:
             guard !addressData.isEmpty else { throw MultiaddrError.parseAddressFail }
             let varInt = VarInt.uVarInt(addressData.bytes)
-            guard Int(varInt.value) + varInt.bytesRead == addressData.count else { throw MultiaddrError.parseAddressFail }
-            guard let address = String(data: Data(addressData.dropFirst(varInt.bytesRead)), encoding: .utf8) else { throw MultiaddrError.invalidFormat }
+            guard Int(varInt.value) + varInt.bytesRead == addressData.count else {
+                throw MultiaddrError.parseAddressFail
+            }
+            guard let address = String(data: Data(addressData.dropFirst(varInt.bytesRead)), encoding: .utf8) else {
+                throw MultiaddrError.invalidFormat
+            }
             guard address.count > 0, !address.contains("/") else { throw MultiaddrError.invalidFormat }
             return address
         case .ipcidr:
@@ -102,12 +122,16 @@ extension Address {
         case .garlic32:
             guard !addressData.isEmpty else { throw MultiaddrError.parseAddressFail }
             let varInt = VarInt.uVarInt(addressData.bytes)
-            guard Int(varInt.value) + varInt.bytesRead == addressData.count else { throw MultiaddrError.parseAddressFail }
+            guard Int(varInt.value) + varInt.bytesRead == addressData.count else {
+                throw MultiaddrError.parseAddressFail
+            }
             return try Garlic32.string(for: addressData.dropFirst(varInt.bytesRead))
         case .garlic64:
             guard !addressData.isEmpty else { throw MultiaddrError.parseAddressFail }
             let varInt = VarInt.uVarInt(addressData.bytes)
-            guard Int(varInt.value) + varInt.bytesRead == addressData.count else { throw MultiaddrError.parseAddressFail }
+            guard Int(varInt.value) + varInt.bytesRead == addressData.count else {
+                throw MultiaddrError.parseAddressFail
+            }
             return try Garlic64.string(for: addressData.dropFirst(varInt.bytesRead))
         case .p2p, .ipfs:
             return try P2P.string(for: addressData)
@@ -123,14 +147,16 @@ extension Address {
         case .certhash:
             guard !addressData.isEmpty else { throw MultiaddrError.parseAddressFail }
             let varInt = VarInt.uVarInt(addressData.bytes)
-            guard Int(varInt.value) + varInt.bytesRead == addressData.count else { throw MultiaddrError.parseAddressFail }
+            guard Int(varInt.value) + varInt.bytesRead == addressData.count else {
+                throw MultiaddrError.parseAddressFail
+            }
             return try Multihash(multihash: addressData.dropFirst(varInt.bytesRead)).asMultibase(.base16)
         default:
             throw MultiaddrError.parseAddressFail
         }
     }
-    
-    static private func binaryPackedAddress(_ address:String?, for addrProtocol:MultiaddrProtocol) throws -> Data? {
+
+    static private func binaryPackedAddress(_ address: String?, for addrProtocol: MultiaddrProtocol) throws -> Data? {
         switch addrProtocol {
         case .tcp, .udp, .dccp, .sctp:
             guard let address = address else { throw MultiaddrError.parseAddressFail }
@@ -189,7 +215,7 @@ extension Address {
             throw MultiaddrError.parseAddressFail
         }
     }
-    
+
     static func byteSizeForAddress(_ proto: MultiaddrProtocol, buffer: [UInt8]) -> Int {
         switch proto.size() {
         case .zero:
@@ -197,7 +223,7 @@ extension Address {
         case .fixed(let bits):
             return bits / 8
         case .variableLengthPrefixed:
-            let (sizeValue, bytesRead) = VarInt.uVarInt(buffer) //Varint.readUVarInt(from: buffer)
+            let (sizeValue, bytesRead) = VarInt.uVarInt(buffer)  //Varint.readUVarInt(from: buffer)
             return Int(sizeValue) + bytesRead
         }
     }
@@ -205,14 +231,14 @@ extension Address {
 
 extension Address: CustomStringConvertible {
     public var description: String {
-        return "/" + [addrProtocol.name, address].compactMap{$0}.joined(separator: "/")
+        "/" + [addrProtocol.name, address].compactMap { $0 }.joined(separator: "/")
     }
-    
-    public var codec:MultiaddrProtocol {
-        return addrProtocol
+
+    public var codec: MultiaddrProtocol {
+        addrProtocol
     }
-    
-    public var addr:String? {
-        return address
+
+    public var addr: String? {
+        address
     }
 }
