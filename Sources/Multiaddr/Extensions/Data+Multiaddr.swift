@@ -20,12 +20,12 @@ import Foundation
 
 extension Data {
 
-    var uint16: UInt16 {
-        self.value(ofType: UInt16.self, at: 0, convertEndian: true) ?? 0
+    var uint16: UInt16? {
+        self.value(ofType: UInt16.self, at: 0, convertEndian: true)
     }
 
-    var uint32: UInt32 {
-        self.value(ofType: UInt32.self, at: 0, convertEndian: true) ?? 0
+    var uint32: UInt32? {
+        self.value(ofType: UInt32.self, at: 0, convertEndian: true)
     }
 
     fileprivate func value<T: BinaryInteger>(ofType: T.Type, at offset: Int, convertEndian: Bool = false) -> T? {
