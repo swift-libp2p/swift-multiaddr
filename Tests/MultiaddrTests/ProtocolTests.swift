@@ -1370,34 +1370,34 @@ class ProtocolsTests: XCTestCase {
 
     func testGetPeerID_P2P() throws {
         let ma = try Multiaddr("/p2p-circuit/p2p/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
-        XCTAssertEqual(ma.getPeerID(), "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
+        XCTAssertEqual(ma.getPeerIDString(), "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
     }
 
     func testGetPeerID_P2PCircuit() throws {
         let ma = try Multiaddr(
             "/ip4/0.0.0.0/tcp/8080/p2p/QmZR5a9AAXGqQF2ADqoDdGS8zvqv8n3Pag6TDDnTNMcFW6/p2p-circuit/p2p/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC"
         )
-        XCTAssertEqual(ma.getPeerID(), "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
+        XCTAssertEqual(ma.getPeerIDString(), "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
     }
 
     func testGetPeerID_IPFS() throws {
         let ma = try Multiaddr("/p2p-circuit/ipfs/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
-        XCTAssertEqual(ma.getPeerID(), "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
+        XCTAssertEqual(ma.getPeerIDString(), "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
     }
 
     func testGetPeerID_P2P_CIDv1_BASE32() throws {
         let ma = try Multiaddr("/p2p-circuit/p2p/bafzbeigweq4zr4x4ky2dvv7nanbkw6egutvrrvzw6g3h2rftp7gidyhtt4")
-        XCTAssertEqual(ma.getPeerID(), "bafzbeigweq4zr4x4ky2dvv7nanbkw6egutvrrvzw6g3h2rftp7gidyhtt4")
+        XCTAssertEqual(ma.getPeerIDString(), "bafzbeigweq4zr4x4ky2dvv7nanbkw6egutvrrvzw6g3h2rftp7gidyhtt4")
     }
 
     func testGetPeerID_P2P_CIDv1_BASE32_Nonb58_chars() throws {
         let ma = try Multiaddr("/p2p-circuit/p2p/bafzbeidt255unskpefjmqb2rc27vjuyxopkxgaylxij6pw35hhys4vnyp4")
-        XCTAssertEqual(ma.getPeerID(), "bafzbeidt255unskpefjmqb2rc27vjuyxopkxgaylxij6pw35hhys4vnyp4")
+        XCTAssertEqual(ma.getPeerIDString(), "bafzbeidt255unskpefjmqb2rc27vjuyxopkxgaylxij6pw35hhys4vnyp4")
     }
 
     func testGetPeerID_From_Address_Without_A_PeerID() throws {
         let ma = try Multiaddr("/ip4/0.0.0.0/tcp/1234/utp")
-        XCTAssertNil(ma.getPeerID())
+        XCTAssertNil(ma.getPeerIDString())
     }
 
     /// - MARK: Path Extraction Tests

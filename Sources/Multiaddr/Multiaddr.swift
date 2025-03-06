@@ -111,8 +111,8 @@ public struct Multiaddr: Equatable {
         addresses.popLast()
     }
 
-    /// Extracts a PeerID from the Multiaddress if one exists, otherwise returns nil
-    public func getPeerID() -> String? {
+    /// Extracts a PeerID's String representation from the Multiaddress if one exists, otherwise returns nil
+    public func getPeerIDString() -> String? {
         self.addresses.last(where: {
             ($0.addrProtocol == .p2p || $0.addrProtocol == .ipfs)
         })?.address
