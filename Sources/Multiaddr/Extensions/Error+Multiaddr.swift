@@ -18,7 +18,7 @@
 
 import Foundation
 
-enum MultiaddrError: Error {
+public enum MultiaddrError: Error {
     case invalidFormat
     case parseAddressFail
     case parseIPv4AddressFail
