@@ -103,7 +103,7 @@ extension Address {
             return try IPv6.string(for: addressData)
         case .ip6zone:
             guard !addressData.isEmpty else { throw MultiaddrError.parseAddressFail }
-            let varInt = VarInt.uVarInt(addressData.bytes)
+            let varInt = VarInt.uVarInt(addressData.byteArray)
             guard Int(varInt.value) + varInt.bytesRead == addressData.count else {
                 throw MultiaddrError.parseAddressFail
             }
@@ -122,14 +122,14 @@ extension Address {
             return try Onion3.string(for: addressData)
         case .garlic32:
             guard !addressData.isEmpty else { throw MultiaddrError.parseAddressFail }
-            let varInt = VarInt.uVarInt(addressData.bytes)
+            let varInt = VarInt.uVarInt(addressData.byteArray)
             guard Int(varInt.value) + varInt.bytesRead == addressData.count else {
                 throw MultiaddrError.parseAddressFail
             }
             return try Garlic32.string(for: addressData.dropFirst(varInt.bytesRead))
         case .garlic64:
             guard !addressData.isEmpty else { throw MultiaddrError.parseAddressFail }
-            let varInt = VarInt.uVarInt(addressData.bytes)
+            let varInt = VarInt.uVarInt(addressData.byteArray)
             guard Int(varInt.value) + varInt.bytesRead == addressData.count else {
                 throw MultiaddrError.parseAddressFail
             }
@@ -147,7 +147,7 @@ extension Address {
         //    return str
         case .certhash:
             guard !addressData.isEmpty else { throw MultiaddrError.parseAddressFail }
-            let varInt = VarInt.uVarInt(addressData.bytes)
+            let varInt = VarInt.uVarInt(addressData.byteArray)
             guard Int(varInt.value) + varInt.bytesRead == addressData.count else {
                 throw MultiaddrError.parseAddressFail
             }

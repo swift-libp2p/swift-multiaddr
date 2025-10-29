@@ -28,7 +28,7 @@ struct P2P {
     }
 
     static func string(for data: Data) throws -> String {
-        let varInt = uVarInt(data.bytes)
+        let varInt = uVarInt(data.byteArray)
         guard varInt.bytesRead + Int(varInt.value) == data.count else { throw MultiaddrError.invalidFormat }
         return try Multihash(multihash: data.dropFirst(varInt.bytesRead)).b58String
     }
