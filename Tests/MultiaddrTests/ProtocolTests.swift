@@ -158,8 +158,7 @@ struct ProtocolTests {
         #expect(
             ip6Addr.encapsulate(tcpAddr)
                 .encapsulate(wsAddr)
-                .encapsulate(ipfsAddr).description ==
-            [ip6Addr, tcpAddr, wsAddr, ipfsAddr].map { "\($0)" }.joined()
+                .encapsulate(ipfsAddr).description == [ip6Addr, tcpAddr, wsAddr, ipfsAddr].map { "\($0)" }.joined()
         )
 
         #expect(
@@ -167,16 +166,14 @@ struct ProtocolTests {
                 .encapsulate(wsAddr)
                 .encapsulate(ipfsAddr)
                 //.decapsulate("/ipfs").description,
-                .decapsulate(.ipfs).description ==
-            [ip6Addr, tcpAddr, wsAddr].map { "\($0)" }.joined()
+                .decapsulate(.ipfs).description == [ip6Addr, tcpAddr, wsAddr].map { "\($0)" }.joined()
         )
 
         #expect(
             ip6Addr.encapsulate(tcpAddr)
                 .encapsulate(ipfsAddr)
                 .encapsulate(wsAddr)
-                .decapsulate(.ws).description ==
-            [ip6Addr, tcpAddr, ipfsAddr].map { "\($0)" }.joined()
+                .decapsulate(.ws).description == [ip6Addr, tcpAddr, ipfsAddr].map { "\($0)" }.joined()
         )
     }
 
@@ -224,27 +221,27 @@ struct ProtocolTests {
         #expect(try addr == Multiaddr("/ip6/2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095/tcp/5000"))
         // Built via encapsulation
         #expect(
-            try addr ==
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095").encapsulate(
-                proto: .tcp,
-                address: "5000"
-            )
+            try addr
+                == Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095").encapsulate(
+                    proto: .tcp,
+                    address: "5000"
+                )
         )
         // Different IP6 Address
         #expect(
-            try addr !=
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7096").encapsulate(
-                proto: .tcp,
-                address: "5000"
-            )
+            try addr
+                != Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7096").encapsulate(
+                    proto: .tcp,
+                    address: "5000"
+                )
         )
         // Different Port
         #expect(
-            try addr !=
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095").encapsulate(
-                proto: .tcp,
-                address: "5001"
-            )
+            try addr
+                != Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095").encapsulate(
+                    proto: .tcp,
+                    address: "5001"
+                )
         )
     }
 
@@ -272,27 +269,27 @@ struct ProtocolTests {
         #expect(try addr == Multiaddr("/ip6/2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095/udp/5000"))
         // Built via encapsulation
         #expect(
-            try addr ==
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095").encapsulate(
-                proto: .udp,
-                address: "5000"
-            )
+            try addr
+                == Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095").encapsulate(
+                    proto: .udp,
+                    address: "5000"
+                )
         )
         // Different IP6 Address
         #expect(
-            try addr !=
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7096").encapsulate(
-                proto: .udp,
-                address: "5000"
-            )
+            try addr
+                != Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7096").encapsulate(
+                    proto: .udp,
+                    address: "5000"
+                )
         )
         // Different Port
         #expect(
-            try addr !=
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095").encapsulate(
-                proto: .udp,
-                address: "5001"
-            )
+            try addr
+                != Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095").encapsulate(
+                    proto: .udp,
+                    address: "5001"
+                )
         )
     }
 
@@ -303,34 +300,33 @@ struct ProtocolTests {
         #expect(addr.description == str)
         // Two Multiaddresses initialized with the same string should be equal
         #expect(
-            try addr ==
-            Multiaddr("/ip4/127.0.0.1/p2p/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC/tcp/1234")
+            try addr == Multiaddr("/ip4/127.0.0.1/p2p/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC/tcp/1234")
         )
         // Built via encapsulation
         #expect(
-            try addr ==
-            Multiaddr(.ip4, address: "127.0.0.1")
+            try addr
+                == Multiaddr(.ip4, address: "127.0.0.1")
                 .encapsulate(proto: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
                 .encapsulate(proto: .tcp, address: "1234")
         )
         // Different IP4 Address
         #expect(
-            try addr !=
-            Multiaddr(.ip4, address: "127.0.0.2")
+            try addr
+                != Multiaddr(.ip4, address: "127.0.0.2")
                 .encapsulate(proto: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
                 .encapsulate(proto: .tcp, address: "1234")
         )
         // Different PeerID
         #expect(
-            try addr !=
-            Multiaddr(.ip4, address: "127.0.0.1")
+            try addr
+                != Multiaddr(.ip4, address: "127.0.0.1")
                 .encapsulate(proto: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKD")
                 .encapsulate(proto: .tcp, address: "1234")
         )
         // Different Port
         #expect(
-            try addr !=
-            Multiaddr(.ip4, address: "127.0.0.1")
+            try addr
+                != Multiaddr(.ip4, address: "127.0.0.1")
                 .encapsulate(proto: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
                 .encapsulate(proto: .tcp, address: "1235")
         )
@@ -344,34 +340,33 @@ struct ProtocolTests {
         #expect(addr.description == str)
         // Two Multiaddresses initialized with the same string should be equal
         #expect(
-            try addr ==
-            Multiaddr("/ip4/127.0.0.1/ipfs/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC/tcp/1234")
+            try addr == Multiaddr("/ip4/127.0.0.1/ipfs/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC/tcp/1234")
         )
         // Built via encapsulation
         #expect(
-            try addr ==
-            Multiaddr(.ip4, address: "127.0.0.1")
+            try addr
+                == Multiaddr(.ip4, address: "127.0.0.1")
                 .encapsulate(proto: .ipfs, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
                 .encapsulate(proto: .tcp, address: "1234")
         )
         // Different IP4 Address
         #expect(
-            try addr !=
-            Multiaddr(.ip4, address: "127.0.0.2")
+            try addr
+                != Multiaddr(.ip4, address: "127.0.0.2")
                 .encapsulate(proto: .ipfs, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
                 .encapsulate(proto: .tcp, address: "1234")
         )
         // Different PeerID
         #expect(
-            try addr !=
-            Multiaddr(.ip4, address: "127.0.0.1")
+            try addr
+                != Multiaddr(.ip4, address: "127.0.0.1")
                 .encapsulate(proto: .ipfs, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKD")
                 .encapsulate(proto: .tcp, address: "1234")
         )
         // Different Port
         #expect(
-            try addr !=
-            Multiaddr(.ip4, address: "127.0.0.1")
+            try addr
+                != Multiaddr(.ip4, address: "127.0.0.1")
                 .encapsulate(proto: .ipfs, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
                 .encapsulate(proto: .tcp, address: "1235")
         )
@@ -385,36 +380,36 @@ struct ProtocolTests {
         #expect(addr.description == str)
         // Two Multiaddresses initialized with the same string should be equal
         #expect(
-            try addr ==
-            Multiaddr(
-                "/ip6/2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095/p2p/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC/tcp/1234"
-            )
+            try addr
+                == Multiaddr(
+                    "/ip6/2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095/p2p/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC/tcp/1234"
+                )
         )
         // Built via encapsulation
         #expect(
-            try addr ==
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
+            try addr
+                == Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
                 .encapsulate(proto: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
                 .encapsulate(proto: .tcp, address: "1234")
         )
         // Different IP6 Address
         #expect(
-            try addr !=
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7096")
+            try addr
+                != Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7096")
                 .encapsulate(proto: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
                 .encapsulate(proto: .tcp, address: "1234")
         )
         // Different Port
         #expect(
-            try addr !=
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
+            try addr
+                != Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
                 .encapsulate(proto: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
                 .encapsulate(proto: .tcp, address: "1235")
         )
         // Different PeerID
         #expect(
-            try addr !=
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
+            try addr
+                != Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
                 .encapsulate(proto: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKD")
                 .encapsulate(proto: .tcp, address: "1234")
         )
@@ -429,27 +424,27 @@ struct ProtocolTests {
         #expect(try addr == Multiaddr("/ip4/127.0.0.1/udp/5000/utp"))
         // Built via encapsulation
         #expect(
-            try addr ==
-            Multiaddr(.ip4, address: "127.0.0.1").encapsulate(proto: .udp, address: "5000").encapsulate(
-                proto: .utp,
-                address: nil
-            )
+            try addr
+                == Multiaddr(.ip4, address: "127.0.0.1").encapsulate(proto: .udp, address: "5000").encapsulate(
+                    proto: .utp,
+                    address: nil
+                )
         )
         // Different IP4 Address
         #expect(
-            try addr !=
-            Multiaddr(.ip4, address: "127.0.0.2").encapsulate(proto: .udp, address: "5000").encapsulate(
-                proto: .utp,
-                address: nil
-            )
+            try addr
+                != Multiaddr(.ip4, address: "127.0.0.2").encapsulate(proto: .udp, address: "5000").encapsulate(
+                    proto: .utp,
+                    address: nil
+                )
         )
         // Different Port
         #expect(
-            try addr !=
-            Multiaddr(.ip4, address: "127.0.0.1").encapsulate(proto: .udp, address: "5001").encapsulate(
-                proto: .utp,
-                address: nil
-            )
+            try addr
+                != Multiaddr(.ip4, address: "127.0.0.1").encapsulate(proto: .udp, address: "5001").encapsulate(
+                    proto: .utp,
+                    address: nil
+                )
         )
         //Decapsulating utp
         #expect(addr.decapsulate(.utp).description == "/ip4/127.0.0.1/udp/5000")
@@ -466,27 +461,27 @@ struct ProtocolTests {
         #expect(try addr == Multiaddr("/ip6/2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095/udp/5000/utp"))
         // Built via encapsulation
         #expect(
-            try addr ==
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095").encapsulate(
-                proto: .udp,
-                address: "5000"
-            ).encapsulate(proto: .utp, address: "")
+            try addr
+                == Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095").encapsulate(
+                    proto: .udp,
+                    address: "5000"
+                ).encapsulate(proto: .utp, address: "")
         )
         // Different IP6 Address
         #expect(
-            try addr !=
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7096").encapsulate(
-                proto: .udp,
-                address: "5000"
-            ).encapsulate(proto: .utp, address: "")
+            try addr
+                != Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7096").encapsulate(
+                    proto: .udp,
+                    address: "5000"
+                ).encapsulate(proto: .utp, address: "")
         )
         // Different Port
         #expect(
-            try addr !=
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095").encapsulate(
-                proto: .udp,
-                address: "5001"
-            ).encapsulate(proto: .utp, address: "")
+            try addr
+                != Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095").encapsulate(
+                    proto: .udp,
+                    address: "5001"
+                ).encapsulate(proto: .utp, address: "")
         )
         //Decapsulating utp
         #expect(addr.decapsulate(.utp).description == "/ip6/2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095/udp/5000")
@@ -503,27 +498,27 @@ struct ProtocolTests {
         #expect(try addr == Multiaddr("/ip4/127.0.0.1/tcp/8000/http"))
         // Built via encapsulation
         #expect(
-            try addr ==
-            Multiaddr(.ip4, address: "127.0.0.1").encapsulate(proto: .tcp, address: "8000").encapsulate(
-                proto: .http,
-                address: ""
-            )
+            try addr
+                == Multiaddr(.ip4, address: "127.0.0.1").encapsulate(proto: .tcp, address: "8000").encapsulate(
+                    proto: .http,
+                    address: ""
+                )
         )
         // Different IP4 Address
         #expect(
-            try addr !=
-            Multiaddr(.ip4, address: "127.0.0.2").encapsulate(proto: .tcp, address: "8000").encapsulate(
-                proto: .http,
-                address: ""
-            )
+            try addr
+                != Multiaddr(.ip4, address: "127.0.0.2").encapsulate(proto: .tcp, address: "8000").encapsulate(
+                    proto: .http,
+                    address: ""
+                )
         )
         // Different Port
         #expect(
-            try addr !=
-            Multiaddr(.ip4, address: "127.0.0.1").encapsulate(proto: .tcp, address: "8001").encapsulate(
-                proto: .http,
-                address: ""
-            )
+            try addr
+                != Multiaddr(.ip4, address: "127.0.0.1").encapsulate(proto: .tcp, address: "8001").encapsulate(
+                    proto: .http,
+                    address: ""
+                )
         )
         //Decapsulating utp
         #expect(addr.decapsulate(.http).description == "/ip4/127.0.0.1/tcp/8000")
@@ -540,35 +535,35 @@ struct ProtocolTests {
         #expect(try addr == Multiaddr("/ip4/127.0.0.1/tcp/80/unix/a/b/c/d/e/f"))
         // Built via encapsulation
         #expect(
-            try addr ==
-            Multiaddr(.ip4, address: "127.0.0.1").encapsulate(proto: .tcp, address: "80").encapsulate(
-                proto: .unix,
-                address: "a/b/c/d/e/f"
-            )
+            try addr
+                == Multiaddr(.ip4, address: "127.0.0.1").encapsulate(proto: .tcp, address: "80").encapsulate(
+                    proto: .unix,
+                    address: "a/b/c/d/e/f"
+                )
         )
         // Different IP4 Address
         #expect(
-            try addr !=
-            Multiaddr(.ip4, address: "127.0.0.2").encapsulate(proto: .tcp, address: "80").encapsulate(
-                proto: .unix,
-                address: "a/b/c/d/e/f"
-            )
+            try addr
+                != Multiaddr(.ip4, address: "127.0.0.2").encapsulate(proto: .tcp, address: "80").encapsulate(
+                    proto: .unix,
+                    address: "a/b/c/d/e/f"
+                )
         )
         // Different Port
         #expect(
-            try addr !=
-            Multiaddr(.ip4, address: "127.0.0.1").encapsulate(proto: .tcp, address: "81").encapsulate(
-                proto: .unix,
-                address: "a/b/c/d/e/f"
-            )
+            try addr
+                != Multiaddr(.ip4, address: "127.0.0.1").encapsulate(proto: .tcp, address: "81").encapsulate(
+                    proto: .unix,
+                    address: "a/b/c/d/e/f"
+                )
         )
         // Different Unix Address
         #expect(
-            try addr !=
-            Multiaddr(.ip4, address: "127.0.0.1").encapsulate(proto: .tcp, address: "80").encapsulate(
-                proto: .unix,
-                address: "a/b/c/d/e/g"
-            )
+            try addr
+                != Multiaddr(.ip4, address: "127.0.0.1").encapsulate(proto: .tcp, address: "80").encapsulate(
+                    proto: .unix,
+                    address: "a/b/c/d/e/g"
+                )
         )
         //Decapsulating utp
         #expect(addr.decapsulate(.unix).description == "/ip4/127.0.0.1/tcp/80")
@@ -585,22 +580,22 @@ struct ProtocolTests {
         #expect(try addr == Multiaddr("/ip6/2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095/tcp/8000/http"))
         // Built via encapsulation
         #expect(
-            try addr ==
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
+            try addr
+                == Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
                 .encapsulate(proto: .tcp, address: "8000")
                 .encapsulate(proto: .http, address: "")
         )
         // Different IP6 Address
         #expect(
-            try addr !=
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7096")
+            try addr
+                != Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7096")
                 .encapsulate(proto: .tcp, address: "8000")
                 .encapsulate(proto: .http, address: "")
         )
         // Different Port
         #expect(
-            try addr !=
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
+            try addr
+                != Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
                 .encapsulate(proto: .tcp, address: "8001")
                 .encapsulate(proto: .http, address: "")
         )
@@ -619,29 +614,29 @@ struct ProtocolTests {
         #expect(try addr == Multiaddr("/ip6/2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095/tcp/8000/unix/a/b/c/d/e/f"))
         // Built via encapsulation
         #expect(
-            try addr ==
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
+            try addr
+                == Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
                 .encapsulate(proto: .tcp, address: "8000")
                 .encapsulate(proto: .unix, address: "a/b/c/d/e/f")
         )
         // Different IP6 Address
         #expect(
-            try addr !=
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7096")
+            try addr
+                != Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7096")
                 .encapsulate(proto: .tcp, address: "8000")
                 .encapsulate(proto: .unix, address: "a/b/c/d/e/f")
         )
         // Different Port
         #expect(
-            try addr !=
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
+            try addr
+                != Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
                 .encapsulate(proto: .tcp, address: "8001")
                 .encapsulate(proto: .unix, address: "a/b/c/d/e/f")
         )
         // Different Unix Address
         #expect(
-            try addr !=
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
+            try addr
+                != Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
                 .encapsulate(proto: .tcp, address: "8000")
                 .encapsulate(proto: .unix, address: "a/b/c/d/e/g")
         )
@@ -666,27 +661,27 @@ struct ProtocolTests {
         #expect(try addr == Multiaddr("/ip4/127.0.0.1/tcp/8000/https"))
         // Built via encapsulation
         #expect(
-            try addr ==
-            Multiaddr(.ip4, address: "127.0.0.1").encapsulate(proto: .tcp, address: "8000").encapsulate(
-                proto: .https,
-                address: nil
-            )
+            try addr
+                == Multiaddr(.ip4, address: "127.0.0.1").encapsulate(proto: .tcp, address: "8000").encapsulate(
+                    proto: .https,
+                    address: nil
+                )
         )
         // Different IP4 Address
         #expect(
-            try addr !=
-            Multiaddr(.ip4, address: "127.0.0.2").encapsulate(proto: .tcp, address: "8000").encapsulate(
-                proto: .https,
-                address: nil
-            )
+            try addr
+                != Multiaddr(.ip4, address: "127.0.0.2").encapsulate(proto: .tcp, address: "8000").encapsulate(
+                    proto: .https,
+                    address: nil
+                )
         )
         // Different Port
         #expect(
-            try addr !=
-            Multiaddr(.ip4, address: "127.0.0.1").encapsulate(proto: .tcp, address: "8001").encapsulate(
-                proto: .https,
-                address: nil
-            )
+            try addr
+                != Multiaddr(.ip4, address: "127.0.0.1").encapsulate(proto: .tcp, address: "8001").encapsulate(
+                    proto: .https,
+                    address: nil
+                )
         )
         //Decapsulating utp
         #expect(addr.decapsulate(.https).description == "/ip4/127.0.0.1/tcp/8000")
@@ -709,22 +704,22 @@ struct ProtocolTests {
         #expect(try addr == Multiaddr("/ip6/2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095/tcp/8000/https"))
         // Built via encapsulation
         #expect(
-            try addr ==
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
+            try addr
+                == Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
                 .encapsulate(proto: .tcp, address: "8000")
                 .encapsulate(proto: .https, address: "")
         )
         // Different IP6 Address
         #expect(
-            try addr !=
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7096")
+            try addr
+                != Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7096")
                 .encapsulate(proto: .tcp, address: "8000")
                 .encapsulate(proto: .https, address: "")
         )
         // Different Port
         #expect(
-            try addr !=
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
+            try addr
+                != Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
                 .encapsulate(proto: .tcp, address: "8001")
                 .encapsulate(proto: .https, address: "")
         )
@@ -749,27 +744,27 @@ struct ProtocolTests {
         #expect(try addr == Multiaddr("/ip4/127.0.0.1/tcp/8000/ws"))
         // Built via encapsulation
         #expect(
-            try addr ==
-            Multiaddr(.ip4, address: "127.0.0.1").encapsulate(proto: .tcp, address: "8000").encapsulate(
-                proto: .ws,
-                address: ""
-            )
+            try addr
+                == Multiaddr(.ip4, address: "127.0.0.1").encapsulate(proto: .tcp, address: "8000").encapsulate(
+                    proto: .ws,
+                    address: ""
+                )
         )
         // Different IP4 Address
         #expect(
-            try addr !=
-            Multiaddr(.ip4, address: "127.0.0.2").encapsulate(proto: .tcp, address: "8000").encapsulate(
-                proto: .ws,
-                address: ""
-            )
+            try addr
+                != Multiaddr(.ip4, address: "127.0.0.2").encapsulate(proto: .tcp, address: "8000").encapsulate(
+                    proto: .ws,
+                    address: ""
+                )
         )
         // Different Port
         #expect(
-            try addr !=
-            Multiaddr(.ip4, address: "127.0.0.1").encapsulate(proto: .tcp, address: "8001").encapsulate(
-                proto: .ws,
-                address: ""
-            )
+            try addr
+                != Multiaddr(.ip4, address: "127.0.0.1").encapsulate(proto: .tcp, address: "8001").encapsulate(
+                    proto: .ws,
+                    address: ""
+                )
         )
         //Decapsulating utp
         #expect(addr.decapsulate(.ws).description == "/ip4/127.0.0.1/tcp/8000")
@@ -792,22 +787,22 @@ struct ProtocolTests {
         #expect(try addr == Multiaddr("/ip6/2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095/tcp/8000/ws"))
         // Built via encapsulation
         #expect(
-            try addr ==
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
+            try addr
+                == Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
                 .encapsulate(proto: .tcp, address: "8000")
                 .encapsulate(proto: .ws, address: "")
         )
         // Different IP6 Address
         #expect(
-            try addr !=
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7096")
+            try addr
+                != Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7096")
                 .encapsulate(proto: .tcp, address: "8000")
                 .encapsulate(proto: .ws, address: "")
         )
         // Different Port
         #expect(
-            try addr !=
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
+            try addr
+                != Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
                 .encapsulate(proto: .tcp, address: "8001")
                 .encapsulate(proto: .ws, address: "")
         )
@@ -831,31 +826,31 @@ struct ProtocolTests {
         #expect(addr.description == str)
         // Two Multiaddresses initialized with the same string should be equal
         #expect(
-            try addr ==
-            Multiaddr(
-                "/ip6/2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095/tcp/8000/ws/ipfs/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC"
-            )
+            try addr
+                == Multiaddr(
+                    "/ip6/2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095/tcp/8000/ws/ipfs/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC"
+                )
         )
         // Built via encapsulation
         #expect(
-            try addr ==
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
+            try addr
+                == Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
                 .encapsulate(proto: .tcp, address: "8000")
                 .encapsulate(proto: .ws, address: "")
                 .encapsulate(proto: .ipfs, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
         )
         // Different IP6 Address
         #expect(
-            try addr !=
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7096")
+            try addr
+                != Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7096")
                 .encapsulate(proto: .tcp, address: "8000")
                 .encapsulate(proto: .ws, address: "")
                 .encapsulate(proto: .ipfs, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
         )
         // Different Port
         #expect(
-            try addr !=
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
+            try addr
+                != Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
                 .encapsulate(proto: .tcp, address: "8001")
                 .encapsulate(proto: .ws, address: "")
                 .encapsulate(proto: .ipfs, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
@@ -880,31 +875,31 @@ struct ProtocolTests {
         #expect(addr.description == str)
         // Two Multiaddresses initialized with the same string should be equal
         #expect(
-            try addr ==
-            Multiaddr(
-                "/ip6/2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095/tcp/8000/ws/p2p/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC"
-            )
+            try addr
+                == Multiaddr(
+                    "/ip6/2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095/tcp/8000/ws/p2p/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC"
+                )
         )
         // Built via encapsulation
         #expect(
-            try addr ==
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
+            try addr
+                == Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
                 .encapsulate(proto: .tcp, address: "8000")
                 .encapsulate(proto: .ws, address: "")
                 .encapsulate(proto: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
         )
         // Different IP6 Address
         #expect(
-            try addr !=
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7096")
+            try addr
+                != Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7096")
                 .encapsulate(proto: .tcp, address: "8000")
                 .encapsulate(proto: .ws, address: "")
                 .encapsulate(proto: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
         )
         // Different Port
         #expect(
-            try addr !=
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
+            try addr
+                != Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
                 .encapsulate(proto: .tcp, address: "8001")
                 .encapsulate(proto: .ws, address: "")
                 .encapsulate(proto: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
@@ -929,31 +924,31 @@ struct ProtocolTests {
         #expect(addr.description == str)
         // Two Multiaddresses initialized with the same string should be equal
         #expect(
-            try addr ==
-            Multiaddr(
-                "/ip6/2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095/udp/4001/quic/ipfs/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC"
-            )
+            try addr
+                == Multiaddr(
+                    "/ip6/2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095/udp/4001/quic/ipfs/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC"
+                )
         )
         // Built via encapsulation
         #expect(
-            try addr ==
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
+            try addr
+                == Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
                 .encapsulate(proto: .udp, address: "4001")
                 .encapsulate(proto: .quic, address: "")
                 .encapsulate(proto: .ipfs, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
         )
         // Different IP6 Address
         #expect(
-            try addr !=
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7096")
+            try addr
+                != Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7096")
                 .encapsulate(proto: .udp, address: "4001")
                 .encapsulate(proto: .quic, address: "")
                 .encapsulate(proto: .ipfs, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
         )
         // Different Port
         #expect(
-            try addr !=
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
+            try addr
+                != Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
                 .encapsulate(proto: .udp, address: "4000")
                 .encapsulate(proto: .quic, address: "")
                 .encapsulate(proto: .ipfs, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
@@ -979,31 +974,31 @@ struct ProtocolTests {
         #expect(addr.description == str)
         // Two Multiaddresses initialized with the same string should be equal
         #expect(
-            try addr ==
-            Multiaddr(
-                "/ip6/2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095/udp/4001/quic/p2p/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC"
-            )
+            try addr
+                == Multiaddr(
+                    "/ip6/2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095/udp/4001/quic/p2p/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC"
+                )
         )
         // Built via encapsulation
         #expect(
-            try addr ==
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
+            try addr
+                == Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
                 .encapsulate(proto: .udp, address: "4001")
                 .encapsulate(proto: .quic, address: "")
                 .encapsulate(proto: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
         )
         // Different IP6 Address
         #expect(
-            try addr !=
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7096")
+            try addr
+                != Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7096")
                 .encapsulate(proto: .udp, address: "4001")
                 .encapsulate(proto: .quic, address: "")
                 .encapsulate(proto: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
         )
         // Different Port
         #expect(
-            try addr !=
-            Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
+            try addr
+                != Multiaddr(.ip6, address: "2001:8a0:7ac5:4201:3ac9:86ff:fe31:7095")
                 .encapsulate(proto: .udp, address: "4000")
                 .encapsulate(proto: .quic, address: "")
                 .encapsulate(proto: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
@@ -1039,8 +1034,9 @@ struct ProtocolTests {
         // Description should equal initialization string
         #expect(addr.description == str)
         #expect(
-            addr.addresses ==
-            [try Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")]
+            addr.addresses == [
+                try Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
+            ]
         )
     }
 
@@ -1057,8 +1053,9 @@ struct ProtocolTests {
         // Description should equal initialization string
         #expect(addr.description == "/p2p/bafzbeidt255unskpefjmqb2rc27vjuyxopkxgaylxij6pw35hhys4vnyp4")
         #expect(
-            addr.addresses ==
-            [try Address(addrProtocol: .p2p, address: "QmW8rAgaaA6sRydK1k6vonShQME47aDxaFidbtMevWs73t")]
+            addr.addresses == [
+                try Address(addrProtocol: .p2p, address: "QmW8rAgaaA6sRydK1k6vonShQME47aDxaFidbtMevWs73t")
+            ]
         )
     }
 
@@ -1076,12 +1073,14 @@ struct ProtocolTests {
         // Description should equal initialization string
         #expect(addr.description == str)
         #expect(
-            addr.addresses ==
-            [try Address(addrProtocol: .ipfs, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")]
+            addr.addresses == [
+                try Address(addrProtocol: .ipfs, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
+            ]
         )
         #expect(
-            addr.addresses ==
-            [try Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")]
+            addr.addresses == [
+                try Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
+            ]
         )
     }
 
@@ -1144,8 +1143,7 @@ struct ProtocolTests {
         // Description should equal initialization string
         #expect(addr.description == str)
         #expect(
-            addr.addresses ==
-            [
+            addr.addresses == [
                 try Address(
                     addrProtocol: .onion3,
                     address: "vww6ybal4bd7szmgncyruucpgfkqahzddi37ktceo3ah7ngmcopnpyyd:1234"
@@ -1197,8 +1195,7 @@ struct ProtocolTests {
         // Description should equal initialization string
         #expect(addr.description == str)
         #expect(
-            addr.addresses ==
-            [
+            addr.addresses == [
                 try Address(addrProtocol: .p2p_circuit, address: nil),
                 try Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC"),
             ]
@@ -1217,8 +1214,7 @@ struct ProtocolTests {
         // Description should equal initialization string
         #expect(addr.description == str)
         #expect(
-            addr.addresses ==
-            [
+            addr.addresses == [
                 try Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC"),
                 try Address(addrProtocol: .p2p_circuit, address: ""),
             ]
@@ -1237,8 +1233,7 @@ struct ProtocolTests {
         // Description should equal initialization string
         #expect(addr.description == str)
         #expect(
-            addr.addresses ==
-            [
+            addr.addresses == [
                 try Address(addrProtocol: .ipfs, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC"),
                 try Address(addrProtocol: .p2p_circuit, address: ""),
             ]
@@ -1257,8 +1252,7 @@ struct ProtocolTests {
         // Description should equal initialization string
         #expect(addr.description == str)
         #expect(
-            addr.addresses ==
-            [
+            addr.addresses == [
                 try Address(addrProtocol: .ip4, address: "127.0.0.1"),
                 try Address(addrProtocol: .tcp, address: "9090"),
                 try Address(addrProtocol: .ws, address: ""),
@@ -1280,8 +1274,7 @@ struct ProtocolTests {
         // Description should equal initialization string
         #expect(addr.description == str)
         #expect(
-            addr.addresses ==
-            [
+            addr.addresses == [
                 try Address(addrProtocol: .ip4, address: "127.0.0.1"),
                 try Address(addrProtocol: .tcp, address: "9090"),
                 try Address(addrProtocol: .ws, address: ""),
@@ -1297,12 +1290,11 @@ struct ProtocolTests {
         let addr = try Multiaddr(str)
         // Description should equal initialization string
         #expect(
-            addr.description ==
-            "/ip4/127.0.0.1/tcp/9090/ws/p2p-webrtc-star/ipfs/bafzbeidt255unskpefjmqb2rc27vjuyxopkxgaylxij6pw35hhys4vnyp4"
+            addr.description
+                == "/ip4/127.0.0.1/tcp/9090/ws/p2p-webrtc-star/ipfs/bafzbeidt255unskpefjmqb2rc27vjuyxopkxgaylxij6pw35hhys4vnyp4"
         )
         #expect(
-            addr.addresses ==
-            [
+            addr.addresses == [
                 try Address(addrProtocol: .ip4, address: "127.0.0.1"),
                 try Address(addrProtocol: .tcp, address: "9090"),
                 try Address(addrProtocol: .ws, address: ""),
@@ -1323,8 +1315,7 @@ struct ProtocolTests {
         // Description should equal initialization string
         #expect(addr.description == str)
         #expect(
-            addr.addresses ==
-            [
+            addr.addresses == [
                 try Address(addrProtocol: .ip4, address: "127.0.0.1"),
                 try Address(addrProtocol: .tcp, address: "9090"),
                 try Address(addrProtocol: .http, address: ""),
@@ -1345,8 +1336,7 @@ struct ProtocolTests {
         // Description should equal initialization string
         #expect(addr.description == str)
         #expect(
-            addr.addresses ==
-            [
+            addr.addresses == [
                 try Address(addrProtocol: .ip4, address: "127.0.0.1"),
                 try Address(addrProtocol: .tcp, address: "9090"),
                 try Address(addrProtocol: .ws, address: ""),
