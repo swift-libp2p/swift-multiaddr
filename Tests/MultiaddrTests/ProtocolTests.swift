@@ -1034,8 +1034,8 @@ struct ProtocolTests {
         // Description should equal initialization string
         #expect(addr.description == str)
         #expect(
-            addr.addresses == [
-                try Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
+            try addr.addresses == [
+                Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
             ]
         )
     }
@@ -1053,8 +1053,8 @@ struct ProtocolTests {
         // Description should equal initialization string
         #expect(addr.description == "/p2p/bafzbeidt255unskpefjmqb2rc27vjuyxopkxgaylxij6pw35hhys4vnyp4")
         #expect(
-            addr.addresses == [
-                try Address(addrProtocol: .p2p, address: "QmW8rAgaaA6sRydK1k6vonShQME47aDxaFidbtMevWs73t")
+            try addr.addresses == [
+                Address(addrProtocol: .p2p, address: "QmW8rAgaaA6sRydK1k6vonShQME47aDxaFidbtMevWs73t")
             ]
         )
     }
@@ -1073,13 +1073,13 @@ struct ProtocolTests {
         // Description should equal initialization string
         #expect(addr.description == str)
         #expect(
-            addr.addresses == [
-                try Address(addrProtocol: .ipfs, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
+            try addr.addresses == [
+                Address(addrProtocol: .ipfs, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
             ]
         )
         #expect(
-            addr.addresses == [
-                try Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
+            try addr.addresses == [
+                Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
             ]
         )
     }
@@ -1095,7 +1095,7 @@ struct ProtocolTests {
         let addr = try Multiaddr(str)
         // Description should equal initialization string
         #expect(addr.description == str)
-        #expect(addr.addresses == [try Address(addrProtocol: .onion, address: "timaq4ygg2iegci7:1234")])
+        #expect(try addr.addresses == [Address(addrProtocol: .onion, address: "timaq4ygg2iegci7:1234")])
     }
 
     //      it('onion bad length', () => {
@@ -1143,8 +1143,8 @@ struct ProtocolTests {
         // Description should equal initialization string
         #expect(addr.description == str)
         #expect(
-            addr.addresses == [
-                try Address(
+            try addr.addresses == [
+                Address(
                     addrProtocol: .onion3,
                     address: "vww6ybal4bd7szmgncyruucpgfkqahzddi37ktceo3ah7ngmcopnpyyd:1234"
                 )
@@ -1195,9 +1195,9 @@ struct ProtocolTests {
         // Description should equal initialization string
         #expect(addr.description == str)
         #expect(
-            addr.addresses == [
-                try Address(addrProtocol: .p2p_circuit, address: nil),
-                try Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC"),
+            try addr.addresses == [
+                Address(addrProtocol: .p2p_circuit, address: nil),
+                Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC"),
             ]
         )
     }
@@ -1214,9 +1214,9 @@ struct ProtocolTests {
         // Description should equal initialization string
         #expect(addr.description == str)
         #expect(
-            addr.addresses == [
-                try Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC"),
-                try Address(addrProtocol: .p2p_circuit, address: ""),
+            try addr.addresses == [
+                Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC"),
+                Address(addrProtocol: .p2p_circuit, address: ""),
             ]
         )
     }
@@ -1233,9 +1233,9 @@ struct ProtocolTests {
         // Description should equal initialization string
         #expect(addr.description == str)
         #expect(
-            addr.addresses == [
-                try Address(addrProtocol: .ipfs, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC"),
-                try Address(addrProtocol: .p2p_circuit, address: ""),
+            try addr.addresses == [
+                Address(addrProtocol: .ipfs, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC"),
+                Address(addrProtocol: .p2p_circuit, address: ""),
             ]
         )
     }
@@ -1252,12 +1252,12 @@ struct ProtocolTests {
         // Description should equal initialization string
         #expect(addr.description == str)
         #expect(
-            addr.addresses == [
-                try Address(addrProtocol: .ip4, address: "127.0.0.1"),
-                try Address(addrProtocol: .tcp, address: "9090"),
-                try Address(addrProtocol: .ws, address: ""),
-                try Address(addrProtocol: .p2p_webrtc_star, address: ""),
-                try Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC"),
+            try addr.addresses == [
+                Address(addrProtocol: .ip4, address: "127.0.0.1"),
+                Address(addrProtocol: .tcp, address: "9090"),
+                Address(addrProtocol: .ws, address: ""),
+                Address(addrProtocol: .p2p_webrtc_star, address: ""),
+                Address(addrProtocol: .p2p, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC"),
             ]
         )
     }
@@ -1274,12 +1274,12 @@ struct ProtocolTests {
         // Description should equal initialization string
         #expect(addr.description == str)
         #expect(
-            addr.addresses == [
-                try Address(addrProtocol: .ip4, address: "127.0.0.1"),
-                try Address(addrProtocol: .tcp, address: "9090"),
-                try Address(addrProtocol: .ws, address: ""),
-                try Address(addrProtocol: .p2p_webrtc_star, address: ""),
-                try Address(addrProtocol: .ipfs, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC"),
+            try addr.addresses == [
+                Address(addrProtocol: .ip4, address: "127.0.0.1"),
+                Address(addrProtocol: .tcp, address: "9090"),
+                Address(addrProtocol: .ws, address: ""),
+                Address(addrProtocol: .p2p_webrtc_star, address: ""),
+                Address(addrProtocol: .ipfs, address: "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC"),
             ]
         )
     }
@@ -1294,12 +1294,12 @@ struct ProtocolTests {
                 == "/ip4/127.0.0.1/tcp/9090/ws/p2p-webrtc-star/ipfs/bafzbeidt255unskpefjmqb2rc27vjuyxopkxgaylxij6pw35hhys4vnyp4"
         )
         #expect(
-            addr.addresses == [
-                try Address(addrProtocol: .ip4, address: "127.0.0.1"),
-                try Address(addrProtocol: .tcp, address: "9090"),
-                try Address(addrProtocol: .ws, address: ""),
-                try Address(addrProtocol: .p2p_webrtc_star, address: ""),
-                try Address(addrProtocol: .ipfs, address: "QmW8rAgaaA6sRydK1k6vonShQME47aDxaFidbtMevWs73t"),
+            try addr.addresses == [
+                Address(addrProtocol: .ip4, address: "127.0.0.1"),
+                Address(addrProtocol: .tcp, address: "9090"),
+                Address(addrProtocol: .ws, address: ""),
+                Address(addrProtocol: .p2p_webrtc_star, address: ""),
+                Address(addrProtocol: .ipfs, address: "QmW8rAgaaA6sRydK1k6vonShQME47aDxaFidbtMevWs73t"),
             ]
         )
     }
@@ -1315,11 +1315,11 @@ struct ProtocolTests {
         // Description should equal initialization string
         #expect(addr.description == str)
         #expect(
-            addr.addresses == [
-                try Address(addrProtocol: .ip4, address: "127.0.0.1"),
-                try Address(addrProtocol: .tcp, address: "9090"),
-                try Address(addrProtocol: .http, address: ""),
-                try Address(addrProtocol: .p2p_webrtc_direct, address: ""),
+            try addr.addresses == [
+                Address(addrProtocol: .ip4, address: "127.0.0.1"),
+                Address(addrProtocol: .tcp, address: "9090"),
+                Address(addrProtocol: .http, address: ""),
+                Address(addrProtocol: .p2p_webrtc_direct, address: ""),
             ]
         )
     }
@@ -1336,11 +1336,11 @@ struct ProtocolTests {
         // Description should equal initialization string
         #expect(addr.description == str)
         #expect(
-            addr.addresses == [
-                try Address(addrProtocol: .ip4, address: "127.0.0.1"),
-                try Address(addrProtocol: .tcp, address: "9090"),
-                try Address(addrProtocol: .ws, address: ""),
-                try Address(addrProtocol: .p2p_websocket_star, address: ""),
+            try addr.addresses == [
+                Address(addrProtocol: .ip4, address: "127.0.0.1"),
+                Address(addrProtocol: .tcp, address: "9090"),
+                Address(addrProtocol: .ws, address: ""),
+                Address(addrProtocol: .p2p_websocket_star, address: ""),
             ]
         )
     }
