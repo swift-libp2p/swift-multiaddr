@@ -19,7 +19,7 @@
 import Foundation
 import VarInt
 
-public struct Multiaddr: Equatable {
+public struct Multiaddr: Equatable, Sendable {
 
     public private(set) var addresses: [Address] = []
 

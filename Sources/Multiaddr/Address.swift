@@ -22,7 +22,7 @@ import Multicodec
 import Multihash
 import VarInt
 
-public struct Address: Equatable {
+public struct Address: Equatable, Sendable {
     let addrProtocol: MultiaddrProtocol
     let address: String?
 
