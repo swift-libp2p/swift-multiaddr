@@ -64,7 +64,7 @@ public struct Address: Equatable, Sendable {
     func binaryPacked() throws -> Data {
         let bytes = [addrProtocol.packedCode(), try Address.binaryPackedAddress(self.address, for: self.addrProtocol)]
             .compactMap { $0 }.flatMap { $0 }
-        return Data(bytes: bytes, count: bytes.count)
+        return Data(bytes)
     }
 
     public static func == (lhs: Address, rhs: Address) -> Bool {

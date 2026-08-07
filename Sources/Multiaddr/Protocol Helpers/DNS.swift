@@ -24,7 +24,7 @@ struct DNS {
         let addressBytes = Data(address.utf8)
         let sizeBytes = UInt64(addressBytes.count).varIntData()
         let combined = [Array(sizeBytes), Array(addressBytes)].flatMap { $0 }
-        return Data(bytes: combined, count: combined.count)
+        return Data(combined)
     }
 
     static func string(for data: Data) throws -> String? {

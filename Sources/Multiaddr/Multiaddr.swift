@@ -49,7 +49,7 @@ public struct Multiaddr: Equatable, Sendable {
     /// Returns the `Multiaddr` as data
     public func binaryPacked() throws -> Data {
         let bytes = try addresses.flatMap { try $0.binaryPacked() }
-        return Data(bytes: bytes, count: bytes.count)
+        return Data(bytes)
     }
 
     /// Returns a list of `Protocol` elements contained by this `Multiaddr`, ordered from left-to-right.
