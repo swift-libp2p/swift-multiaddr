@@ -24,12 +24,12 @@ struct DNS {
         let addressBytes = Data(address.utf8)
         let sizeBytes = UInt64(addressBytes.count).varIntData()
         let combined = [Array(sizeBytes), Array(addressBytes)].flatMap { $0 }
-        return Data(bytes: combined, count: combined.count)
+        return Data(combined)
     }
 
     static func string(for data: Data) throws -> String? {
         let buffer = Array(data)
-        let decodedVarint = VarInt.uVarInt(buffer)  //Varint.readUVarInt(from: buffer)
+        let decodedVarint = VarInt.uVarInt(buffer)
         let expectedSize = decodedVarint.value
 
         let addressBytes = Array(buffer[decodedVarint.bytesRead...])

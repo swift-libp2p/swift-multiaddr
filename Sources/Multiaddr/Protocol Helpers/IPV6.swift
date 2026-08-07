@@ -18,15 +18,8 @@
 
 import Foundation
 
-//import Network
-
 struct IPv6 {
-    //static func data(for string: String) throws -> Data {
-    //    guard let addr = IPv6Address(string) else { throw MultiaddrError.parseIPv6AddressFail }
-    //    return addr.rawValue
-    //}
-
-    /// Converts an IPv4 string address into it's data representation
+    /// Converts an IPv6 string address into it's data representation
     ///
     /// - Note: This code was lifted from [Bouke/DNS](https://github.com/Bouke/DNS/blob/master/Sources/DNS/IP.swift)
     static func data(for string: String) throws -> Data {
@@ -47,7 +40,7 @@ struct IPv6 {
 
     static func string(for data: Data) throws -> String {
         guard data.count == MemoryLayout<in6_addr>.size else {
-            throw MultiaddrError.parseIPv4AddressFail
+            throw MultiaddrError.parseIPv6AddressFail
         }
 
         var address = data.withUnsafeBytes { bytesPointer -> in6_addr in
@@ -64,7 +57,7 @@ struct IPv6 {
                 #endif
             })
         else {
-            return "Invalid IPv6 address"
+            throw MultiaddrError.parseIPv6AddressFail
         }
         return String(cString: presentationBytes)
     }

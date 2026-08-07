@@ -47,7 +47,7 @@ let package = Package(
     ...
     dependencies: [
         ...
-        .package(url: "https://github.com/swift-libp2p/swift-multiaddr.git", .upToNextMajor(from: "0.0.1"))
+        .package(url: "https://github.com/swift-libp2p/swift-multiaddr.git", .upToNextMinor(from: "0.2.0"))
     ],
     ...
         .target(
@@ -63,7 +63,7 @@ let package = Package(
 ## Usage
 
 ### Example 
-check out the [tests](https://github.com/SwiftEthereum/Multiaddr/blob/main/Tests/MultiaddrTests/MultiaddrTests.swift) for more examples
+check out the [tests](https://github.com/swift-libp2p/swift-multiaddr/tree/main/Tests/MultiaddrTests) for more examples
 
 ```Swift
 
@@ -98,11 +98,31 @@ let proto = try! Multiaddr("/udt")
 
 ip.encapsulate(proto) // -> "/ip4/127.0.0.1/udt"
 
-/// Address Decapsulation
+/// Address Decapsulation (removes the last occurrence of the target and everything after it)
 let full = try! Multiaddr("/ip4/1.2.3.4/tcp/80")
 let port = try! Multiaddr("/tcp/80")
 
 full.decapsulate(port) // -> "/ip4/1.2.3.4"
+
+
+/// Multiaddr is a Collection of its Addresses, so you can iterate and use the standard library
+for address in full {
+    print(address.codec, address.addr as Any)
+}
+full.count      // -> 2
+full.first?.codec // -> .ip4
+
+
+/// Extract a PeerID (as a String or a typed Multihash)
+let p2p = try! Multiaddr("/ip4/127.0.0.1/tcp/4001/p2p/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC")
+p2p.getPeerIDString()    // -> Optional("Qmcgpsy...")
+p2p.getPeerIDMultihash() // -> Optional(<Multihash>)
+
+
+/// Multiaddr is Codable (encoded as its human-readable string), Hashable, Equatable and Sendable
+let json = try JSONEncoder().encode(full)      // "\/ip4\/1.2.3.4\/tcp\/80"
+let back = try JSONDecoder().decode(Multiaddr.self, from: json)
+let set: Set<Multiaddr> = [full, back]          // count == 1
 
 ```
 
@@ -110,45 +130,71 @@ full.decapsulate(port) // -> "/ip4/1.2.3.4"
 ```Swift
 
 /// Initializers
-Multiaddr.init(_ string: String) throws    
-Multiaddr.init(_ bytes: Data) throws 
-Multiaddr.init(_ proto: MultiaddrProtocol, address: String?) throws 
+Multiaddr.init(_ string: String) throws    // parse the human-readable form, e.g. "/ip4/127.0.0.1/tcp/4001"
+Multiaddr.init(_ bytes: Data) throws        // parse the packed binary form
+Multiaddr.init(_ proto: MultiaddrProtocol, address: String?) throws
 
 
-/// Methods
+/// The ordered list of Address components (left-to-right)
+Multiaddr.addresses: [Address] { get }
+
 /// Data representation of the `Multiaddr`
 Multiaddr.binaryPacked() throws -> Data
-    
-/// Returns a list of `Protocol` elements contained by this `Multiaddr`, ordered from left-to-right.
-Multiaddr.protocols() -> [MultiaddrProtocol] 
 
-/// Returns a list of `Protocol` elements as Multicodec Names contained by this `Multiaddr`, ordered from left-to-right.
+/// Returns a list of `Protocol` elements contained by this `Multiaddr`, ordered from left-to-right.
+Multiaddr.protocols() -> [MultiaddrProtocol]
+
+/// Returns the protocols as Multicodec Names, ordered from left-to-right.
 Multiaddr.protoNames() -> [String]
 
-/// Returns a list of `Protocol` elements as Multicodec Codes contained by this `Multiaddr`, ordered from left-to-right.
-Multiaddr.protoCodes() -> [UInt64] 
+/// Returns the protocols as Multicodec Codes, ordered from left-to-right.
+Multiaddr.protoCodes() -> [UInt64]
 
 /// Encapsulation
-Multiaddr.encapsulate(_ other: Multiaddr) -> Multiaddr 
+Multiaddr.encapsulate(_ other: Multiaddr) -> Multiaddr
 Multiaddr.encapsulate(_ other: String) throws -> Multiaddr
-Multiaddr.encapsulate(proto: MultiaddrProtocol, address:String?) throws -> Multiaddr
+Multiaddr.encapsulate(proto: MultiaddrProtocol, address: String?) throws -> Multiaddr
 
-/// Decapsulation
+/// Decapsulation — removes the LAST occurrence of the target and everything after it
 Multiaddr.decapsulate(_ other: Multiaddr) -> Multiaddr
 Multiaddr.decapsulate(_ other: String) -> Multiaddr
 Multiaddr.decapsulate(_ other: MultiaddrProtocol) -> Multiaddr
 
-/// Other Methods
 /// Removes and returns the last `Address` of this `Multiaddr`.
 Multiaddr.pop() -> Address?
 
-/// Extracts a PeerID from the Multiaddress if one exists, otherwise returns nil
-Multiaddr..getPeerID() -> String? 
+/// Peer ID accessors (for /p2p and /ipfs components)
+Multiaddr.getPeerIDString() -> String?          // the raw peer-id string, if present
+Multiaddr.getPeerIDMultihash() -> Multihash?    // the peer-id as a typed Multihash (handles CID-encoded ids)
 
 /// Extracts a Unix Path from the Multiaddress if one exists, otherwise returns nil
 Multiaddr.getPath() -> String?
 
+/// Lookup / mutation by codec
+Multiaddr.getFirstAddress(forCodec codec: MultiaddrProtocol) -> Address?
+Multiaddr.getAddresses(forCodec codec: MultiaddrProtocol) -> [Address]
+Multiaddr.swap(address newAddress: String, forCodec codec: MultiaddrProtocol) throws -> Multiaddr
+Multiaddr.mutatingSwap(address newAddress: String, forCodec codec: MultiaddrProtocol) throws
+
+
+/// Protocol conformances
+/// - Equatable, Hashable, Sendable
+/// - CustomStringConvertible  (`description` is the human-readable string)
+/// - Codable                  (encoded/decoded as the human-readable string)
+/// - RandomAccessCollection   (iterate the `Address` components directly)
+
 ```
+
+### Supported Protocols
+`ip4`, `ip6`, `ip6zone`, `ipcidr`, `tcp`, `udp`, `dccp`, `sctp`, `dns`, `dns4`, `dns6`, `dnsaddr`,
+`sni`, `http`, `https`, `ws`, `wss`, `quic`, `quic-v1`, `webtransport`, `certhash`, `p2p`/`ipfs`,
+`p2p-circuit`, `p2p-webrtc-star`, `p2p-websocket-star`, `p2p-webrtc-direct`, `webrtc`,
+`webrtc-direct`, `tls`, `noise`, `plaintextv2`, `onion`, `onion3`, `garlic32`, `garlic64`, `unix`,
+`udt`, `utp`.
+
+> Parsing is strict: unknown protocol names and malformed binary are rejected rather than silently
+> dropped. The binary (`binaryPacked()`) encoding is verified byte-for-byte against the
+> go-, js-, and rust-multiaddr reference test vectors.
 
 ## Contributing
 
@@ -164,7 +210,7 @@ Let's make this code better together! 🤝
 
 ## License
 
-[MIT](LICENSE) © 2022 Breth Inc.
+[MIT](LICENSE) © 2026 Breth Inc.
 
 
 

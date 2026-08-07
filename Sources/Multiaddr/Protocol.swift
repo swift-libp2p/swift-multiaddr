@@ -87,6 +87,5 @@ extension MultiaddrProtocol {
 extension String {
     func isMultiaddrProtocol() -> Bool {
         (try? Codecs(self).isMultiaddrProtocol()) ?? false
-        //return MultiaddrProtocol.allCases.map{$0.rawValue}.contains(self)
     }
 }
