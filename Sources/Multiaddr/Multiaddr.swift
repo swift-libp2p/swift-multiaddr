@@ -18,6 +18,8 @@
 
 import Foundation
 import VarInt
+import Multihash
+import CID
 
 public struct Multiaddr: Equatable, Sendable {
 
@@ -34,6 +36,7 @@ public struct Multiaddr: Equatable, Sendable {
         guard !bytes.isEmpty else { throw MultiaddrError.invalidFormat }
         self.addresses = try createAddresses(fromData: bytes)
         guard !self.addresses.isEmpty else { throw MultiaddrError.parseAddressFail }
+        try validate()
     }
 
     public init(_ proto: MultiaddrProtocol, address: String?) throws {
@@ -80,16 +83,19 @@ public struct Multiaddr: Equatable, Sendable {
         encapsulate(try Multiaddr(proto, address: address))
     }
 
-    /// Returns a new `Multiaddr`, removing the specified `Multiaddr` and all subsequent addresses.
+    /// Returns a new `Multiaddr`, removing the last occurance of the specified `Multiaddr` and all subsequent addresses.
     public func decapsulate(_ other: Multiaddr) -> Multiaddr {
-        let new = addresses.prefix(while: { $0 != other.addresses.first })
-        return Multiaddr(Array(new))
+        guard let first = other.addresses.first else { return self }
+        if let lastMatch = addresses.lastIndex(where: { $0 == first }) {
+            return Multiaddr(Array(addresses[..<lastMatch]))
+        } else {
+            return self
+        }
     }
 
     /// Returns a new `Multiaddr`, removing the last occurance of the protocol and all subsequent addresses.
     public func decapsulate(_ other: String) -> Multiaddr {
         let protoName = other.hasPrefix("/") ? String(other.dropFirst()) : other
-        //guard let codec = try? Codecs(protoName) else { return self }
         if let lastMatch = addresses.lastIndex(where: { $0.addrProtocol.name == protoName }) {
             return Multiaddr(Array(addresses[..<lastMatch]))
         } else {
@@ -182,9 +188,6 @@ extension Multiaddr: CustomStringConvertible {
     public var description: String {
         guard !addresses.isEmpty else { return "/" }
         return addresses.map { $0.description }.joined()
-        //let desc = addresses.map { $0.description }.joined()
-        // Remove Trailing "/"
-        //return desc.hasSuffix("/") ? String(desc.dropLast()) : desc
     }
 }
 
@@ -199,7 +202,7 @@ extension Multiaddr {
             let current = components.removeFirst()
 
             guard !current.isEmpty else { throw MultiaddrError.invalidFormat }
-            guard current.isMultiaddrProtocol() else { continue }
+            guard current.isMultiaddrProtocol() else { throw MultiaddrError.unknownProtocol }
 
             var addressElements = [String]()
             while let next = components.first, !next.isMultiaddrProtocol() {
@@ -218,7 +221,9 @@ extension Multiaddr {
 
         while !buffer.isEmpty {
             let decodedVarint = VarInt.uVarInt(buffer)  //Varint.readUVarInt(from: buffer)
-            precondition(decodedVarint.bytesRead >= 0, "Varint size must not exceed 64 bytes.")
+            // Guard against a malformed varint that reads zero bytes, which would prevent the
+            // loop from making forward progress and spin indefinitely.
+            guard decodedVarint.bytesRead > 0 else { throw MultiaddrError.invalidFormat }
 
             buffer.removeFirst(decodedVarint.bytesRead)
 
@@ -230,8 +235,9 @@ extension Multiaddr {
             }
 
             let addressSize = Address.byteSizeForAddress(proto, buffer: buffer)
+            guard addressSize > 0, buffer.count >= addressSize else { throw MultiaddrError.invalidFormat }
             let addressBytes = Data(buffer.prefix(addressSize))
-            let address = Address(addrProtocol: proto, addressData: addressBytes)
+            let address = try Address(addrProtocol: proto, addressData: addressBytes)
             addresses.append(address)
 
             buffer.removeFirst(addressSize)
@@ -248,8 +254,7 @@ extension Multiaddr {
 
 extension Multiaddr: Hashable {
     public func hash(into hasher: inout Hasher) {
-        //hasher.combine(self.description)
-        hasher.combine(try! self.binaryPacked())
+        hasher.combine(try? self.binaryPacked())
     }
 }
 
