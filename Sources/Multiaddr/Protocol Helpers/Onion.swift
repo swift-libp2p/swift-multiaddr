@@ -86,7 +86,8 @@ struct Onion3 {
     }
 
     static func string(for data: Data) throws -> String {
-        //guard data.count == 52 else { throw MultiaddrError.invalidOnionHostAddress }
+        // onion3 is a 35-byte host + 2-byte port = 37 bytes total.
+        guard data.count == 37 else { throw MultiaddrError.invalidOnionHostAddress }
         let portBytes = Data(data.suffix(2))
         guard let port = portBytes.uint16 else { throw MultiaddrError.invalidPortValue }
         let portString = String(port.bigEndian)
