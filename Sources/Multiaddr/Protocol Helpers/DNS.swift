@@ -29,7 +29,7 @@ struct DNS {
 
     static func string(for data: Data) throws -> String? {
         let buffer = Array(data)
-        let decodedVarint = VarInt.uVarInt(buffer)  //Varint.readUVarInt(from: buffer)
+        let decodedVarint = VarInt.uVarInt(buffer)
         let expectedSize = decodedVarint.value
 
         let addressBytes = Array(buffer[decodedVarint.bytesRead...])
