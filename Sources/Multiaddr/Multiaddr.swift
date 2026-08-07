@@ -264,3 +264,43 @@ extension Array where Element == String {
         return joined(separator: "/")
     }
 }
+
+// MARK: - Codable
+
+extension Multiaddr: Codable {
+    /// Decodes a `Multiaddr` from its human-readable string representation (e.g. `/ip4/127.0.0.1/tcp/4001`).
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let string = try container.decode(String.self)
+        try self.init(string)
+    }
+
+    /// Encodes a `Multiaddr` as its human-readable string representation.
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self.description)
+    }
+}
+
+// MARK: - Collection
+
+extension Multiaddr: RandomAccessCollection {
+    public var startIndex: Int { addresses.startIndex }
+    public var endIndex: Int { addresses.endIndex }
+    public subscript(position: Int) -> Address { addresses[position] }
+    public func index(after i: Int) -> Int { addresses.index(after: i) }
+    public func index(before i: Int) -> Int { addresses.index(before: i) }
+}
+
+// MARK: - Typed accessors
+
+extension Multiaddr {
+    /// Extracts the PeerID from the multiaddr as a `Multihash`, if a `p2p`/`ipfs` component exists.
+    ///
+    /// Handles both raw multihash strings and CID-encoded peer ids (returning the underlying multihash).
+    public func getPeerIDMultihash() -> Multihash? {
+        guard let peerIDString = getPeerIDString() else { return nil }
+        if let cid = try? CID(peerIDString) { return cid.multihash }
+        return try? Multihash(multihash: peerIDString)
+    }
+}
