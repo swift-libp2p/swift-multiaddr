@@ -26,13 +26,13 @@ public struct Address: Equatable, Sendable {
     let addrProtocol: MultiaddrProtocol
     let address: String?
 
-    init(addrProtocol: MultiaddrProtocol, addressData: Data) {
+    init(addrProtocol: MultiaddrProtocol, addressData: Data) throws {
         self.addrProtocol = addrProtocol
         guard !addressData.isEmpty else {
             self.address = nil
             return
         }
-        self.address = try? Address.unpackAddress(addressData, for: addrProtocol)
+        self.address = try Address.unpackAddress(addressData, for: addrProtocol)
     }
 
     init(addrProtocol: MultiaddrProtocol, address: String? = nil) throws {
@@ -92,6 +92,12 @@ public struct Address: Equatable, Sendable {
 extension Address {
 
     static private func unpackAddress(_ addressData: Data, for addrProtocol: MultiaddrProtocol) throws -> String? {
+        // Zero-sized (flag) protocols must not carry any address bytes. `size()` is the single
+        // source of truth for this membership, so we don't maintain a hand-written protocol list.
+        if case .zero = addrProtocol.size() {
+            guard addressData.isEmpty else { throw MultiaddrError.parseAddressFail }
+            return nil
+        }
         switch addrProtocol {
         case .tcp, .udp, .dccp, .sctp:
             guard addressData.count == 2 else { throw MultiaddrError.parseAddressFail }
@@ -138,13 +144,6 @@ extension Address {
             return try P2P.string(for: addressData)
         case .dns, .dns4, .dns6, .dnsaddr, .sni, .unix:
             return try DNS.string(for: addressData)
-        case .http, .https, .utp, .udt, .ws, .wss, .quic, .p2p_circuit:
-            guard addressData.isEmpty else { throw MultiaddrError.parseAddressFail }
-            return nil
-        //case .http, .https:
-        //    if addressData.isEmpty { return nil }
-        //    guard let str = String(data: addressData, encoding: .utf8) else { throw MultiaddrError.parseAddressFail }
-        //    return str
         case .certhash:
             guard !addressData.isEmpty else { throw MultiaddrError.parseAddressFail }
             let varInt = VarInt.uVarInt(Array(addressData))
@@ -158,6 +157,12 @@ extension Address {
     }
 
     static private func binaryPackedAddress(_ address: String?, for addrProtocol: MultiaddrProtocol) throws -> Data? {
+        // Zero-sized (flag) protocols must not carry an address. `size()` is the single source of
+        // truth for this membership.
+        if case .zero = addrProtocol.size() {
+            guard address == nil else { throw MultiaddrError.parseAddressFail }
+            return nil
+        }
         switch addrProtocol {
         case .tcp, .udp, .dccp, .sctp:
             guard let address = address else { throw MultiaddrError.parseAddressFail }
@@ -174,7 +179,7 @@ extension Address {
             guard let address = address else { throw MultiaddrError.parseAddressFail }
             guard !address.contains("/") else { throw MultiaddrError.invalidFormat }
             let data = Data(address.utf8)
-            return Data(putUVarInt(UInt64(data.count)) + data)
+            return Data(VarInt.putUVarInt(UInt64(data.count)) + data)
         case .ipcidr:
             guard let address = address else { throw MultiaddrError.parseAddressFail }
             let ipMask = try Data(decoding: address, as: .base10)
@@ -198,21 +203,13 @@ extension Address {
         case .dns, .dns4, .dns6, .dnsaddr, .sni, .unix:
             guard let address = address else { throw MultiaddrError.parseAddressFail }
             return DNS.data(for: address)
-        case .http, .https, .utp, .udt, .ws, .wss, .quic, .p2p_circuit:
-            guard address == nil else { throw MultiaddrError.parseAddressFail }
-            return nil
-        //case .http, .https:
-        //    if let address = address {
-        //        return Data(address.utf8)
-        //    } else {
-        //        return nil
-        //    }
         case .certhash:
             guard let address = address else { throw MultiaddrError.parseAddressFail }
             let mh = try Multihash(multihash: address)
             return Data(VarInt.putUVarInt(UInt64(mh.value.count)) + mh.value)
         default:
-            if address == nil { return nil }
+            // Any remaining protocol is neither zero-sized (handled above) nor explicitly
+            // supported, so we cannot pack an address for it.
             throw MultiaddrError.parseAddressFail
         }
     }
@@ -224,7 +221,7 @@ extension Address {
         case .fixed(let bits):
             return bits / 8
         case .variableLengthPrefixed:
-            let (sizeValue, bytesRead) = VarInt.uVarInt(buffer)  //Varint.readUVarInt(from: buffer)
+            let (sizeValue, bytesRead) = VarInt.uVarInt(buffer)
             return Int(sizeValue) + bytesRead
         }
     }
