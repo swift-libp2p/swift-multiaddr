@@ -24,7 +24,7 @@ import VarInt
 struct P2P {
     static func data(for address: String) throws -> Data {
         let multihash = try (try? CID(address).multihash) ?? Multihash(multihash: address)
-        return Data(putUVarInt(UInt64(multihash.value.count)) + multihash.value)
+        return Data(VarInt.putUVarInt(UInt64(multihash.value.count)) + multihash.value)
     }
 
     static func string(for data: Data) throws -> String {
