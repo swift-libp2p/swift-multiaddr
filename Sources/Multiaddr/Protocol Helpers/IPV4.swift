@@ -18,14 +18,7 @@
 
 import Foundation
 
-//import Network
-
 struct IPv4 {
-    //static func data(for string: String) throws -> Data {
-    //    guard let addr = IPv4Address(string) else { throw MultiaddrError.parseIPv4AddressFail }
-    //    return addr.rawValue
-    //}
-
     /// Converts an IPv4 string address into it's data representation
     ///
     /// - Note: This code was lifted from [Bouke/DNS](https://github.com/Bouke/DNS/blob/master/Sources/DNS/IP.swift)
@@ -56,7 +49,7 @@ struct IPv4 {
                 #endif
             })
         else {
-            return "Invalid IPv4 address"
+            throw MultiaddrError.parseIPv4AddressFail
         }
         return String(cString: presentationBytes)
     }
