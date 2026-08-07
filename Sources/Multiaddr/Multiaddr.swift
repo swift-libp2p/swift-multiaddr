@@ -16,10 +16,10 @@
 //  Modified by Brandon Toms on 5/1/22.
 //
 
-import Foundation
-import VarInt
-import Multihash
 import CID
+import Foundation
+import Multihash
+import VarInt
 
 public struct Multiaddr: Equatable, Sendable {
 
