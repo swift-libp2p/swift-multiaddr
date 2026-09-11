@@ -23,9 +23,9 @@ struct Garlic32 {
         if string.count < 55 && string.count != 52 { throw MultiaddrError.invalidGarlicAddress }
         // Pad up to the next multiple of 8 for base32 decoding.
         let padded = string + String(repeating: "=", count: (8 - string.count % 8) % 8)
-        let decoded = try BaseEncoding.decode(padded, as: .base32Pad).data
+        let decoded: [UInt8] = try BaseEncoding.decode(padded, as: .base32Pad)
         if decoded.count < 35 && decoded.count != 32 { throw MultiaddrError.invalidGarlicAddress }
-        return Data(VarInt.putUVarInt(UInt64(decoded.count)) + decoded)
+        return Data(UInt64(decoded.count).varIntBytes + decoded)
     }
 
     static func string(for data: Data) throws -> String {
@@ -42,14 +42,14 @@ struct Garlic64 {
 
     static func data(for string: String) throws -> Data {
         guard string.count >= 516 && string.count <= 616 else { throw MultiaddrError.invalidGarlicAddress }
-        let decoded = try BaseX.decode(string, as: .custom(Garlic64.alphabet))
+        let decoded: [UInt8] = try BaseX.decode(string, as: .custom(Garlic64.alphabet))
         guard decoded.count >= 386 else { throw MultiaddrError.invalidGarlicAddress }
-        return Data(VarInt.putUVarInt(UInt64(decoded.count)) + decoded)
+        return Data(UInt64(decoded.count).varIntBytes + decoded)
     }
 
     static func string(for data: Data) throws -> String {
         guard data.count >= 386 else { throw MultiaddrError.invalidGarlicAddress }
-        let encoded = BaseX.encode(data, into: .custom(Garlic64.alphabet))
+        let encoded = BaseX.encodedString(data, into: .custom(Garlic64.alphabet))
         guard encoded.count >= 516 && encoded.count <= 616 else { throw MultiaddrError.invalidGarlicAddress }
         return encoded
     }

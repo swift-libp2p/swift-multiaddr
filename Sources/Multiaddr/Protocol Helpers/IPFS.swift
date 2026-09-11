@@ -18,18 +18,29 @@
 
 import CID
 import Foundation
+import Multibase
 import Multihash
 import VarInt
 
 struct P2P {
+    /// The `Multihash` a `p2p`/`ipfs` address component names.
+    ///
+    /// A peer id is written either as a CID or as a bare base58btc Multihash, which carries no
+    /// multibase prefix, so the base is named explicitly rather than read off the string.
+    static func multihash(for address: String) throws -> Multihash {
+        if let cid = try? CID(address) { return cid.multihash }
+        return try Multihash(BaseEncoding.decode(address, as: .base58btc))
+    }
+
     static func data(for address: String) throws -> Data {
-        let multihash = try (try? CID(address).multihash) ?? Multihash(multihash: address)
-        return Data(VarInt.putUVarInt(UInt64(multihash.value.count)) + multihash.value)
+        let multihash = try P2P.multihash(for: address)
+        return Data(UInt64(multihash.value.count).varIntBytes + multihash.value)
     }
 
     static func string(for data: Data) throws -> String {
-        let varInt = VarInt.uVarInt(Array(data))
-        guard varInt.bytesRead + Int(varInt.value) == data.count else { throw MultiaddrError.invalidFormat }
-        return try Multihash(multihash: data.dropFirst(varInt.bytesRead)).b58String
+        guard let (length, end) = try? VarInt.decode(data) else { throw MultiaddrError.invalidFormat }
+        let multihashBytes = data[end...]
+        guard Int(length) == multihashBytes.count else { throw MultiaddrError.invalidFormat }
+        return try Multihash(multihashBytes).asString(base: .base58btc)
     }
 }

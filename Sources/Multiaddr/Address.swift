@@ -18,6 +18,7 @@
 
 import CID
 import Foundation
+import Multibase
 import Multicodec
 import Multihash
 import VarInt
@@ -41,14 +42,12 @@ public struct Address: Equatable, Sendable {
         case .p2p, .ipfs:
             //Ensure addy is a valid CID or Multihash compliant String and store it as a b58 String if so...
             guard let address = address, !address.isEmpty else { throw MultiaddrError.parseAddressFail }
-            guard ((try? CID(address)) != nil) || ((try? Multihash(multihash: address)) != nil) else {
-                throw MultiaddrError.parseAddressFail
-            }
+            guard (try? P2P.multihash(for: address)) != nil else { throw MultiaddrError.parseAddressFail }
             self.address = address
         case .certhash:
             // Ensure Certhash is a valid Multihash
             guard let address = address, !address.isEmpty else { throw MultiaddrError.parseAddressFail }
-            guard (try? Multihash(multihash: address)) != nil else { throw MultiaddrError.parseAddressFail }
+            guard (try? Multihash(multibase: address)) != nil else { throw MultiaddrError.parseAddressFail }
             self.address = address
         default:
             if var address = address {
@@ -72,14 +71,14 @@ public struct Address: Equatable, Sendable {
         case (.certhash, .certhash):
             do {
                 guard let leftAddress = lhs.address, let rightAddress = rhs.address else { return false }
-                return try Multihash(multihash: leftAddress).value == Multihash(multihash: rightAddress).value
+                return try Multihash(multibase: leftAddress).value == Multihash(multibase: rightAddress).value
             } catch {
                 return false
             }
         case (.p2p, .p2p), (.ipfs, .ipfs), (.p2p, .ipfs), (.ipfs, .p2p):
             do {
                 guard let leftAddress = lhs.address, let rightAddress = rhs.address else { return false }
-                return try CID(leftAddress).multihash == CID(rightAddress).multihash
+                return try P2P.multihash(for: leftAddress) == P2P.multihash(for: rightAddress)
             } catch {
                 return false
             }
@@ -109,11 +108,10 @@ extension Address {
             return try IPv6.string(for: addressData)
         case .ip6zone:
             guard !addressData.isEmpty else { throw MultiaddrError.parseAddressFail }
-            let varInt = VarInt.uVarInt(Array(addressData))
-            guard Int(varInt.value) + varInt.bytesRead == addressData.count else {
-                throw MultiaddrError.parseAddressFail
-            }
-            guard let address = String(data: Data(addressData.dropFirst(varInt.bytesRead)), encoding: .utf8) else {
+            guard let (length, end) = try? VarInt.decode(addressData) else { throw MultiaddrError.parseAddressFail }
+            let zoneBytes = addressData[end...]
+            guard Int(length) == zoneBytes.count else { throw MultiaddrError.parseAddressFail }
+            guard let address = String(data: Data(zoneBytes), encoding: .utf8) else {
                 throw MultiaddrError.invalidFormat
             }
             guard address.count > 0, !address.contains("/") else { throw MultiaddrError.invalidFormat }
@@ -128,29 +126,26 @@ extension Address {
             return try Onion3.string(for: addressData)
         case .garlic32:
             guard !addressData.isEmpty else { throw MultiaddrError.parseAddressFail }
-            let varInt = VarInt.uVarInt(Array(addressData))
-            guard Int(varInt.value) + varInt.bytesRead == addressData.count else {
-                throw MultiaddrError.parseAddressFail
-            }
-            return try Garlic32.string(for: addressData.dropFirst(varInt.bytesRead))
+            guard let (length, end) = try? VarInt.decode(addressData) else { throw MultiaddrError.parseAddressFail }
+            let garlic32Bytes = addressData[end...]
+            guard Int(length) == garlic32Bytes.count else { throw MultiaddrError.parseAddressFail }
+            return try Garlic32.string(for: garlic32Bytes)
         case .garlic64:
             guard !addressData.isEmpty else { throw MultiaddrError.parseAddressFail }
-            let varInt = VarInt.uVarInt(Array(addressData))
-            guard Int(varInt.value) + varInt.bytesRead == addressData.count else {
-                throw MultiaddrError.parseAddressFail
-            }
-            return try Garlic64.string(for: addressData.dropFirst(varInt.bytesRead))
+            guard let (length, end) = try? VarInt.decode(addressData) else { throw MultiaddrError.parseAddressFail }
+            let garlic64Bytes = addressData[end...]
+            guard Int(length) == garlic64Bytes.count else { throw MultiaddrError.parseAddressFail }
+            return try Garlic64.string(for: garlic64Bytes)
         case .p2p, .ipfs:
             return try P2P.string(for: addressData)
         case .dns, .dns4, .dns6, .dnsaddr, .sni, .unix:
             return try DNS.string(for: addressData)
         case .certhash:
             guard !addressData.isEmpty else { throw MultiaddrError.parseAddressFail }
-            let varInt = VarInt.uVarInt(Array(addressData))
-            guard Int(varInt.value) + varInt.bytesRead == addressData.count else {
-                throw MultiaddrError.parseAddressFail
-            }
-            return try Multihash(multihash: addressData.dropFirst(varInt.bytesRead)).asMultibase(.base16)
+            guard let (length, end) = try? VarInt.decode(addressData) else { throw MultiaddrError.parseAddressFail }
+            let multihashBytes = addressData[end...]
+            guard Int(length) == multihashBytes.count else { throw MultiaddrError.parseAddressFail }
+            return try Multihash(multihashBytes).asString(base: .base16, withMultibasePrefix: true)
         default:
             throw MultiaddrError.parseAddressFail
         }
@@ -179,10 +174,10 @@ extension Address {
             guard let address = address else { throw MultiaddrError.parseAddressFail }
             guard !address.contains("/") else { throw MultiaddrError.invalidFormat }
             let data = Data(address.utf8)
-            return Data(VarInt.putUVarInt(UInt64(data.count)) + data)
+            return Data(UInt64(data.count).varIntBytes) + data
         case .ipcidr:
             guard let address = address else { throw MultiaddrError.parseAddressFail }
-            let ipMask = try Data(decoding: address, as: .base10)
+            let ipMask = Data(try BaseEncoding.decode(address, as: .base10))
             guard ipMask.count == 1 else { throw MultiaddrError.parseAddressFail }
             return ipMask
         case .onion:
@@ -205,8 +200,8 @@ extension Address {
             return DNS.data(for: address)
         case .certhash:
             guard let address = address else { throw MultiaddrError.parseAddressFail }
-            let mh = try Multihash(multihash: address)
-            return Data(VarInt.putUVarInt(UInt64(mh.value.count)) + mh.value)
+            let mh = try Multihash(multibase: address)
+            return Data(UInt64(mh.value.count).varIntBytes + mh.value)
         default:
             // Any remaining protocol is neither zero-sized (handled above) nor explicitly
             // supported, so we cannot pack an address for it.
@@ -221,8 +216,9 @@ extension Address {
         case .fixed(let bits):
             return bits / 8
         case .variableLengthPrefixed:
-            let (sizeValue, bytesRead) = VarInt.uVarInt(buffer)
-            return Int(sizeValue) + bytesRead
+            // A malformed length prefix reports a zero size, which the caller rejects.
+            guard let (sizeValue, end) = try? VarInt.decode(buffer) else { return 0 }
+            return Int(sizeValue) + end
         }
     }
 }

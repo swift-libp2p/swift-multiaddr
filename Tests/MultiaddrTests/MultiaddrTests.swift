@@ -339,14 +339,14 @@ struct MultiaddrTests {
     }
 
     @Test func testIPv4FromBytes() throws {
-        let addy = try Address(addrProtocol: .ip4, addressData: BaseEncoding.decode("c0a80001", as: .base16).data)
+        let addy = try Address(addrProtocol: .ip4, addressData: Data(BaseEncoding.decode("c0a80001", as: .base16)))
         #expect(addy.description == "/ip4/192.168.0.1")
     }
 
     @Test func testIPv6FromBytes() throws {
         let addy = try Address(
             addrProtocol: .ip6,
-            addressData: BaseEncoding.decode("abcd0000000100020003000400050006", as: .base16).data
+            addressData: Data(BaseEncoding.decode("abcd0000000100020003000400050006", as: .base16))
         )
         #expect(addy.description == "/ip6/abcd:0:1:2:3:4:5:6")
     }

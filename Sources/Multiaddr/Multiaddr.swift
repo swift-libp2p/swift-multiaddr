@@ -16,7 +16,6 @@
 //  Modified by Brandon Toms on 5/1/22.
 //
 
-import CID
 import Foundation
 import Multihash
 import VarInt
@@ -209,7 +208,10 @@ extension Multiaddr {
                 components.removeFirst()
                 addressElements.append(next)
             }
-            let newAddress = try Address(addrProtocol: MultiaddrProtocol(current), address: addressElements.combined())
+            let newAddress = try Address(
+                addrProtocol: MultiaddrProtocol(name: current),
+                address: addressElements.combined()
+            )
             addresses.append(newAddress)
         }
         return addresses
@@ -220,14 +222,13 @@ extension Multiaddr {
         var addresses = [Address]()
 
         while !buffer.isEmpty {
-            let decodedVarint = VarInt.uVarInt(buffer)  //Varint.readUVarInt(from: buffer)
-            // Guard against a malformed varint that reads zero bytes, which would prevent the
-            // loop from making forward progress and spin indefinitely.
-            guard decodedVarint.bytesRead > 0 else { throw MultiaddrError.invalidFormat }
+            // A malformed varint throws rather than reading zero bytes, so the loop always
+            // makes forward progress and can't spin indefinitely.
+            guard let (code, end) = try? VarInt.decode(buffer) else { throw MultiaddrError.invalidFormat }
 
-            buffer.removeFirst(decodedVarint.bytesRead)
+            buffer.removeFirst(end)
 
-            guard let proto = try? MultiaddrProtocol(decodedVarint.value) else { throw MultiaddrError.unknownProtocol }
+            guard let proto = try? MultiaddrProtocol(code: code) else { throw MultiaddrError.unknownProtocol }
 
             if case .zero = proto.size() {
                 addresses.append(try Address(addrProtocol: proto))
@@ -300,7 +301,6 @@ extension Multiaddr {
     /// Handles both raw multihash strings and CID-encoded peer ids (returning the underlying multihash).
     public func getPeerIDMultihash() -> Multihash? {
         guard let peerIDString = getPeerIDString() else { return nil }
-        if let cid = try? CID(peerIDString) { return cid.multihash }
-        return try? Multihash(multihash: peerIDString)
+        return try? P2P.multihash(for: peerIDString)
     }
 }
