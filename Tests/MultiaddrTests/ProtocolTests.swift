@@ -106,7 +106,7 @@ struct ProtocolTests {
         //        expect(multiaddr('/').encapsulate(udpAddr).toString()).to.equal(udpAddr.toString())
         //        expect(multiaddr('/').decapsulate('/').toString()).to.equal('/')
         let udpAddrStr = "/ip4/127.0.0.1/udp/1234"
-        let udpAddrBuf = try BaseEncoding.decode("047f000001910204d2", as: .base16).data
+        let udpAddrBuf = Data(try BaseEncoding.decode("047f000001910204d2", as: .base16))
 
         let udpAddr = try Multiaddr(udpAddrStr)
 

@@ -22,17 +22,13 @@ import VarInt
 struct DNS {
     static func data(for address: String) -> Data {
         let addressBytes = Data(address.utf8)
-        let sizeBytes = UInt64(addressBytes.count).varIntData()
-        let combined = [Array(sizeBytes), Array(addressBytes)].flatMap { $0 }
-        return Data(combined)
+        return Data(UInt64(addressBytes.count).varIntBytes) + addressBytes
     }
 
     static func string(for data: Data) throws -> String? {
-        let buffer = Array(data)
-        let decodedVarint = VarInt.uVarInt(buffer)
-        let expectedSize = decodedVarint.value
+        guard let (expectedSize, end) = try? VarInt.decode(data) else { throw MultiaddrError.parseAddressFail }
 
-        let addressBytes = Array(buffer[decodedVarint.bytesRead...])
+        let addressBytes = data[end...]
         guard addressBytes.count == expectedSize else { throw MultiaddrError.parseAddressFail }
 
         return String(data: Data(addressBytes), encoding: .utf8)

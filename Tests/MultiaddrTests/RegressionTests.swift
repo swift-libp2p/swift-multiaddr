@@ -110,7 +110,7 @@ struct RegressionTests {
         let peerID = "QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC"
         let ma = try Multiaddr("/ip4/127.0.0.1/tcp/4001/p2p/\(peerID)")
         #expect(ma.getPeerIDString() == peerID)
-        #expect(ma.getPeerIDMultihash()?.b58String == peerID)
+        #expect(ma.getPeerIDMultihash()?.asString(base: .base58btc) == peerID)
 
         let noPeer = try Multiaddr("/ip4/127.0.0.1/tcp/4001")
         #expect(noPeer.getPeerIDMultihash() == nil)

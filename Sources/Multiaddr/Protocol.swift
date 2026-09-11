@@ -69,7 +69,7 @@ extension MultiaddrProtocol {
     }
 
     func packedCode() -> Data {
-        code.varIntData()
+        Data(asVarInt)
     }
 
     func isEqual(_ codec: MultiaddrProtocol) -> Bool {
@@ -86,6 +86,6 @@ extension MultiaddrProtocol {
 
 extension String {
     func isMultiaddrProtocol() -> Bool {
-        (try? Codecs(self).isMultiaddrProtocol()) ?? false
+        (try? Codecs(name: self).isMultiaddrProtocol()) ?? false
     }
 }
